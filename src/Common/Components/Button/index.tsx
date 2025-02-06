@@ -24,7 +24,6 @@ export const Button = ({
   hoverText = "white",
   bg = "Primary-500",
   hoverBg = "dark",
-  dataCopy = "exclude",
   border = "primary",
   hoverBorder = "dark",
   children,

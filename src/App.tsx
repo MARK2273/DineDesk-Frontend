@@ -1,5 +1,5 @@
 import Route from "./routes";
-import "./index.css";
+// import "./index.css";
 
 const App = () => {
   return (
