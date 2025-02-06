@@ -1,10 +1,11 @@
 // import NotFound from "@dine-desk/";
-import { Navigate, RouteObject } from "react-router-dom";
+import { RouteObject } from "react-router-dom";
 import NotFound from "../Common/Components/NotFound";
 import Dashboard from "../components/Pages/Dashboard";
 import Menu from "../components/Pages/Menu";
 import Report from "../components/Pages/Report";
 import Order from "../components/Pages/Order";
+import Root from "../components/Pages/Root";
 // import NotFound from "@dine-desk/Common/Components/NotFound";
 
 // const Profile = React.lazy(
@@ -33,7 +34,7 @@ export const ROUTES: RoutesType = {
   DEFAULT: {
     path: "/",
     routeType: "public",
-    element: <Navigate to="/" />,
+    element: <Root />,
   },
   DASHBOARD: {
     path: "/dashboard",
