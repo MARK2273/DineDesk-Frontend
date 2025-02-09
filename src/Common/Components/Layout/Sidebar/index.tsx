@@ -11,10 +11,10 @@ interface SidebarProps {
 }
 
 const menuItems: { icon: IconNameType; label: string; path: string }[] = [
-  { icon: "home", label: "Dashboard", path: ROUTES.DASHBOARD.path },
-  { icon: "home", label: "Menu", path: ROUTES.MENU.path },
-  { icon: "home", label: "Orders", path: ROUTES.ORDER.path },
-  { icon: "home", label: "Repors", path: ROUTES.REPORT.path },
+  { icon: "dashbaord", label: "Dashboard", path: ROUTES.DASHBOARD.path },
+  { icon: "menu", label: "Menu", path: ROUTES.MENU.path },
+  { icon: "order", label: "Orders", path: ROUTES.ORDER.path },
+  { icon: "report", label: "Repors", path: ROUTES.REPORT.path },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({

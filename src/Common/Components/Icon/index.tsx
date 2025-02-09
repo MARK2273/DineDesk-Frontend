@@ -5,10 +5,21 @@ import { SVGAttributes } from "react";
 import LeftArrow from "../../../assets/svg/LeftArrow.svg?react";
 import Errorsvg from "../../../assets/svg/Errorsvg.svg?react";
 import Home from "../../../assets/svg/Home.svg?react";
+import Menu from "../../../assets/svg/Menu.svg?react";
+import Order from "../../../assets/svg/Order.svg?react";
+import Dashbaord from "../../../assets/svg/Dashbaord.svg?react";
+import Report from "../../../assets/svg/Report.svg?react";
 import Image from "../Image";
 import SectionLoader from "../Loader/Spinner";
 
-export type IconNameType = "leftarrow" | "errorsvg" | "home";
+export type IconNameType =
+  | "leftarrow"
+  | "errorsvg"
+  | "home"
+  | "menu"
+  | "order"
+  | "report"
+  | "dashbaord";
 
 type IconProps = {
   name: IconNameType;
@@ -50,6 +61,14 @@ const Icon = ({
         return <Errorsvg {...iconProps} />;
       case "home":
         return <Home {...iconProps} />;
+      case "menu":
+        return <Menu {...iconProps} />;
+      case "order":
+        return <Order {...iconProps} />;
+      case "report":
+        return <Report {...iconProps} />;
+      case "dashbaord":
+        return <Dashbaord {...iconProps} />;
       default:
         return <></>;
     }
