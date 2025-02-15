@@ -9,17 +9,19 @@ import Menu from "../../../assets/svg/Menu.svg?react";
 import Order from "../../../assets/svg/Order.svg?react";
 import Dashbaord from "../../../assets/svg/Dashbaord.svg?react";
 import Report from "../../../assets/svg/Report.svg?react";
+import Close from "../../../assets/svg/Close.svg?react";
 import Image from "../Image";
 import SectionLoader from "../Loader/Spinner";
 
 export type IconNameType =
-  | "leftarrow"
+  | "leftArrow"
   | "errorsvg"
   | "home"
   | "menu"
   | "order"
   | "report"
-  | "dashbaord";
+  | "dashbaord"
+  | "close";
 
 type IconProps = {
   name: IconNameType;
@@ -55,7 +57,7 @@ const Icon = ({
     const iconProps = { ...restProps }; // No need to pass fill/stroke explicitly now
 
     switch (icon) {
-      case "leftarrow":
+      case "leftArrow":
         return <LeftArrow {...iconProps} />;
       case "errorsvg":
         return <Errorsvg {...iconProps} />;
@@ -69,6 +71,8 @@ const Icon = ({
         return <Report {...iconProps} />;
       case "dashbaord":
         return <Dashbaord {...iconProps} />;
+      case "close":
+        return <Close {...iconProps} />;
       default:
         return <></>;
     }

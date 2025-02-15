@@ -31,7 +31,7 @@ export const RoutesArray: RouteObject[] = applySuspense([
       routeObj["element"] = (
         <>
           {/* <AuthenticateRoute> */}
-          {ROUTES.DASHBOARD.path !== route.path ? (
+          {ROUTES.DEFAULT.path !== route.path ? (
             <AppLayout>
               <ErrorBoundary path={ROUTES.DASHBOARD.path}>
                 {route.element}

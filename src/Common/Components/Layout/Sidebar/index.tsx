@@ -58,7 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               isSidebarOpen ? "rotate-180" : "rotate-0"
             )}
           >
-            <Icon name="leftarrow" />
+            <Icon name="leftArrow" />
           </div>
         </div>
       </div>
