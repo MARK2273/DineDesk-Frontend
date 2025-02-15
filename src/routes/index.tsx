@@ -29,17 +29,19 @@ export const RoutesArray: RouteObject[] = applySuspense([
 
     if (route.routeType === "authenticate") {
       routeObj["element"] = (
-        // <AuthenticateRoute>
-        <AppLayout>
-          {ROUTES.DASHBOARD.path !== route.path ? (
-            <ErrorBoundary path={ROUTES.DASHBOARD.path}>
-              {route.element}
-            </ErrorBoundary>
+        <>
+          {/* <AuthenticateRoute> */}
+          {ROUTES.DEFAULT.path !== route.path ? (
+            <AppLayout>
+              <ErrorBoundary path={ROUTES.DASHBOARD.path}>
+                {route.element}
+              </ErrorBoundary>
+            </AppLayout>
           ) : (
             <>{route.element}</>
           )}
-        </AppLayout>
-        // </AuthenticateRoute>
+          {/* </AuthenticateRoute> */}
+        </>
       );
     } else if (route.routeType === "un-authenticate") {
       routeObj["element"] = (

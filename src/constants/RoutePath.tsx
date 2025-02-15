@@ -5,6 +5,7 @@ import Dashboard from "../components/Pages/Dashboard";
 import Menu from "../components/Pages/Menu";
 import Report from "../components/Pages/Report";
 import Order from "../components/Pages/Order";
+import Login from "../components/Pages/Login";
 import Root from "../components/Pages/Root";
 // import NotFound from "@dine-desk/Common/Components/NotFound";
 
@@ -19,7 +20,8 @@ export type RoutesType = {
     | "DASHBOARD"
     | "MENU"
     | "REPORT"
-    | "ORDER"]: {
+    | "ORDER"
+    | "LOGIN"]: {
     path: string;
     headerName?: string;
     routeType: "public" | "authenticate" | "un-authenticate";
@@ -63,6 +65,13 @@ export const ROUTES: RoutesType = {
     showHeader: true,
     showFooter: true,
     element: <Order />,
+  },
+  LOGIN: {
+    path: "/login",
+    routeType: "public",
+    showHeader: true,
+    showFooter: true,
+    element: <Login />,
   },
   NOT_FOUND: {
     path: "*",
