@@ -7,6 +7,8 @@ import Report from "../components/Pages/Report";
 import Order from "../components/Pages/Order";
 import Login from "../components/Pages/Login";
 import Root from "../components/Pages/Root";
+import ViewMenu from "../components/Pages/Menu/ViewMenu";
+
 // import NotFound from "@dine-desk/Common/Components/NotFound";
 
 // const Profile = React.lazy(
@@ -19,6 +21,7 @@ export type RoutesType = {
     | "NOT_FOUND"
     | "DASHBOARD"
     | "MENU"
+    | "VIEW_MENU"
     | "REPORT"
     | "ORDER"
     | "LOGIN"]: {
@@ -29,6 +32,10 @@ export type RoutesType = {
     showFooter?: boolean;
     element: RouteObject["element"];
     errorElement?: RouteObject["errorElement"];
+  };
+} & {
+  [key in "VIEW_MENU"]: {
+    navigatePath: (id: number | string) => string;
   };
 };
 
@@ -51,6 +58,15 @@ export const ROUTES: RoutesType = {
     showHeader: true,
     showFooter: true,
     element: <Menu />,
+  },
+  VIEW_MENU: {
+    path: "/menu/:menuId",
+    navigatePath: (menuId) => `/menu/${menuId}`,
+    routeType: "authenticate",
+    showHeader: true,
+    showFooter: true,
+    headerName: "View menu",
+    element: <ViewMenu />,
   },
   REPORT: {
     path: "/report",

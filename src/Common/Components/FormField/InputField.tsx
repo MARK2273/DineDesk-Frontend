@@ -124,7 +124,9 @@
 
 // export default InputField;
 
+import clsx from "clsx";
 import { FieldValues, Path, UseFormRegister } from "react-hook-form";
+import Icon, { IconNameType } from "../Icon";
 
 interface InputFieldProps<T extends FieldValues> {
   label: string;
@@ -132,7 +134,19 @@ interface InputFieldProps<T extends FieldValues> {
   error?: string;
   register: UseFormRegister<T>;
   type?: string;
-  className?: string;
+  inputClass?: string;
+  placeholder?: string;
+  parentClassName?: string;
+  inputParentClassName?: string;
+  labelClass?: string;
+  value?: string | number | undefined;
+  disabled?: boolean;
+  required?: boolean;
+  maxLength?: number;
+  icon?: IconNameType;
+  iconClassName?: string;
+  errorClass?: string;
+  onIconClick?: () => void;
 }
 
 const InputField = <T extends FieldValues>({
@@ -141,18 +155,85 @@ const InputField = <T extends FieldValues>({
   error,
   register,
   type = "text",
-  className = "",
+  inputClass = "",
+  placeholder,
+  disabled,
+  parentClassName,
+  labelClass,
+  inputParentClassName,
+  value,
+  required,
+  maxLength,
+  icon,
+  iconClassName,
+  onIconClick,
+  errorClass,
 }: InputFieldProps<T>) => {
+  // return (
+  //   <div className="flex items-center gap-4 flex-nowrap">
+  //     <label className="w-auto whitespace-nowrap">{label}</label>
+  //     <div className="flex flex-col w-full gap-1">
+  //       <input
+  //         {...register(name)}
+  //         type={type}
+  //         className={clsx(
+  //           "w-full px-2.5 py-2.5 border border-solid border-Gray-200 rounded-md focus:outline-Primary-400 focus:outline-1 bg-Gray-400 text-Primary-900 text-base font-normal leading-5 placeholder:text-black/35 truncate",
+  //           inputClass,
+  //           { "!border-red-500 !mb-1.5": error }
+  //         )}
+  //         placeholder={placeholder}
+  //         disabled={disabled}
+  //       />
+  //       {error && <p className="text-red-500 text-xs">{error}</p>}
+  //     </div>
+  //   </div>
+  // );
   return (
-    <div className="flex items-center gap-4 flex-nowrap">
-      <label className="w-auto whitespace-nowrap">{label}</label>
-      <div className="flex flex-col w-full gap-1">
+    <div className={clsx("relative", parentClassName)}>
+      {label && (
+        <label
+          className={clsx(
+            "text-Primary-900 text-base font-normal leading-18px",
+            labelClass
+          )}
+        >
+          {label}{" "}
+          {required && (
+            <span className="text-Red-500 font-bold text-lg">*</span>
+          )}
+        </label>
+      )}
+      <div className={clsx("relative", inputParentClassName)}>
         <input
-          {...register(name)}
           type={type}
-          className={`w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 ${className}`}
+          disabled={disabled}
+          {...(name && { name })}
+          className={clsx(
+            "w-full px-2.5 py-2.5 border border-solid border-Gray-200 rounded-md focus:outline-Primary-400 focus:outline-1 bg-Gray-400 text-Primary-900 text-base font-normal leading-5 placeholder:text-black/35 truncate",
+            inputClass,
+            { "!border-red-500 !mb-1.5": error }
+          )}
+          placeholder={placeholder}
+          value={value}
+          {...(register && name && register(name))}
+          maxLength={maxLength} // Apply maxLength from props
         />
-        {error && <p className="text-red-500 text-xs">{error}</p>}
+        {icon && (
+          <div
+            className={clsx(
+              "absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer",
+              iconClassName
+            )}
+            onClick={onIconClick}
+          >
+            <Icon name={icon} />
+          </div>
+        )}
+        {error && (
+          <p className={`helper__text text-xs text-red-500 ${errorClass} `}>
+            {error}
+          </p>
+        )}
       </div>
     </div>
   );
