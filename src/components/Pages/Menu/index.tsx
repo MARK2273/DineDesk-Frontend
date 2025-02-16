@@ -5,7 +5,7 @@ import { useGetMenuList } from "@dine-desk/api/menu";
 
 const Menu = () => {
   const [openAddOrderModal, setOpenAddOrderModal] = useState<boolean>(false);
-  const [selectedMenu, setSelectedMenu] = useState<any>(null); // Store selected menu for editing
+  const [selectedMenu, setSelectedMenu] = useState<any>(null);
 
   const { data } = useGetMenuList();
 
@@ -17,7 +17,7 @@ const Menu = () => {
       <div className="my-4">
         <Button
           onClick={() => {
-            setSelectedMenu(null); // Reset selected menu for adding a new one
+            setSelectedMenu(null);
             setOpenAddOrderModal(true);
           }}
           title="Add Menu"
@@ -57,7 +57,10 @@ const Menu = () => {
       {/* Add/Edit Menu Modal */}
       {openAddOrderModal && (
         <AddMenu
-          onClose={() => setOpenAddOrderModal(false)}
+          onClose={() => {
+            setOpenAddOrderModal(false);
+            setSelectedMenu(null);
+          }}
           open={openAddOrderModal}
           isEdit={!!selectedMenu}
           id={selectedMenu?.id}

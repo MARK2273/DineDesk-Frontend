@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Button from "@dine-desk/Common/Components/Button";
 import { MenuData, menuSchema } from "@dine-desk/schema/menu";
-// import InputField from "@dine-desk/Common/Components/FormField/InputField";
+import InputField from "@dine-desk/Common/Components/FormField/InputField";
 import Modal from "@dine-desk/Common/Components/Modal";
 import { useCreateMenu, useGetMenu, useUpdateMenu } from "@dine-desk/api/menu";
 import { useEffect } from "react";
@@ -78,28 +78,13 @@ const AddEditMenu: React.FC<AddEditMenuModalProps> = ({
     >
       <div className="flex items-center justify-center">
         <div className="w-full max-w-md bg-white ">
-          {/* <form onSubmit={handleSubmit(onSubmit)} className="space-y-4"> */}
-          {/* <InputField
+          <InputField
             label="Menu Name"
-            parentClassName="flex items-center gap-4 flex-nowrap"
-            labelClass="w-auto whitespace-nowrap"
             name="name"
             error={errors?.name?.message}
             register={register}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-          /> */}
-          <div className="flex items-center gap-4 flex-nowrap">
-            <label className="w-auto whitespace-nowrap">Menu Name</label>
-            <input
-              {...register("name")}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-            {errors?.name?.message && (
-              <p className="text-red-500 text-xs">{errors.name.message}</p>
-            )}
-          </div>
-
-          {/* </form> */}
+          />
         </div>
       </div>
     </Modal>
