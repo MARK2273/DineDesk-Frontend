@@ -1,6 +1,6 @@
 import { MenuData } from "@dine-desk/schema/menu";
 import { useMutation, useQuery } from ".";
-import { axiosGet, axiosPost, axiosPut } from "./axios";
+import { axiosDelete, axiosGet, axiosPost, axiosPut } from "./axios";
 import { menuQueryKeyMap } from "./common/menuQueryKey";
 import { useInvalidateQuery } from "./data-fetching";
 
@@ -76,5 +76,19 @@ export const useGetMenu = (id: string | number | undefined) => {
     },
     experimental_prefetchInRender: true,
     enabled: !!id,
+  });
+};
+
+export const useArchiveMenu = () => {
+  const { invalidate } = useInvalidateQuery();
+  return useMutation({
+    mutationKey: ["archiveMenu"],
+    mutationFn: async (id: number) => {
+      const res = await axiosDelete(`/menu/${id}`);
+      return res;
+    },
+    onSuccess: async () => {
+      await invalidate(menuQueryKeyMap.menuList());
+    },
   });
 };

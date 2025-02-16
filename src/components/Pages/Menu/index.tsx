@@ -1,13 +1,24 @@
-import { useState } from "react";
 import AddMenu from "./AddMenu";
 import Button from "@dine-desk/Common/Components/Button";
-import { useGetMenuList } from "@dine-desk/api/menu";
+import CustomTable from "@dine-desk/Common/Components/Table";
+import useMenuManagement from "./hooks";
+import { ConfirmModal } from "@dine-desk/Common/Components/Modal";
 
 const Menu = () => {
-  const [openAddOrderModal, setOpenAddOrderModal] = useState<boolean>(false);
-  const [selectedMenu, setSelectedMenu] = useState<any>(null);
-
-  const { data } = useGetMenuList();
+  const {
+    data,
+    isDataLoading,
+    columns,
+    openAddOrderModal,
+    setOpenAddOrderModal,
+    selectedMenu,
+    setSelectedMenu,
+    openMenuArchiveConfirmationModal,
+    setOpenMenuArchiveConfirmationModal,
+    handleConfirmArchiveModal,
+    handleToggleModal,
+    isMenuArchivePending,
+  } = useMenuManagement();
 
   return (
     <div>
@@ -27,7 +38,7 @@ const Menu = () => {
       </div>
 
       {/* List of Menus */}
-      <div className="mt-4">
+      {/* <div className="mt-4">
         <h3 className="text-lg font-semibold mb-2">Menu List</h3>
         {data?.length > 0 ? (
           <ul className="space-y-2">
@@ -52,7 +63,13 @@ const Menu = () => {
         ) : (
           <p className="text-gray-500">No menus available</p>
         )}
-      </div>
+      </div> */}
+      <CustomTable
+        data={data}
+        columns={columns}
+        isLoading={isDataLoading}
+        // setTableInstance={setTableInstance}
+      />
 
       {/* Add/Edit Menu Modal */}
       {openAddOrderModal && (
@@ -66,6 +83,30 @@ const Menu = () => {
           id={selectedMenu?.id}
         />
       )}
+
+      <ConfirmModal
+        width="sm"
+        isLoading={isMenuArchivePending}
+        open={openMenuArchiveConfirmationModal}
+        onConfirm={() => {
+          if (selectedMenu?.id !== undefined) {
+            handleConfirmArchiveModal(+selectedMenu?.id);
+          }
+        }}
+        showCancel
+        cancelButtonTitle="Cancel"
+        cancelButtonClassName="bg-white border border-gray-300 cursor-pointer"
+        titleClassName="text-gray-600"
+        onClose={() => {
+          setSelectedMenu(null);
+          handleToggleModal(setOpenMenuArchiveConfirmationModal);
+        }}
+        iconName={"archive"}
+        header="Are you sure?"
+        message={`Are you sure you want to delete this menu?`}
+        confirmButtonTitle={`Yes, Archive`}
+        buttonClassName={"bg-red-900 hover:bg-red-500 cursor-pointer"}
+      ></ConfirmModal>
     </div>
   );
 };

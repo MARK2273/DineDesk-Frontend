@@ -10,6 +10,16 @@ import Order from "../../../assets/svg/Order.svg?react";
 import Dashbaord from "../../../assets/svg/Dashbaord.svg?react";
 import Report from "../../../assets/svg/Report.svg?react";
 import Close from "../../../assets/svg/Close.svg?react";
+import NoDataFound from "../../../assets/svg/NoDataFound.svg?react";
+import Search from "../../../assets/svg/Search.svg?react";
+import PaginationLeftArrow from "../../../assets/svg/PaginationLeftarrow.svg?react";
+import PaginationRightArrow from "../../../assets/svg/PaginationRightArrow.svg?react";
+import AscSorting from "../../../assets/svg/AscSorting.svg?react";
+import DescSorting from "../../../assets/svg/DescSorting.svg?react";
+import Sorting from "../../../assets/svg/Sorting.svg?react";
+import Edit from "../../../assets/svg/Edit.svg?react";
+import Eye from "../../../assets/svg/Eye.svg?react";
+import Archive from "../../../assets/svg/Archive.svg?react";
 import Image from "../Image";
 import SectionLoader from "../Loader/Spinner";
 
@@ -21,7 +31,17 @@ export type IconNameType =
   | "order"
   | "report"
   | "dashbaord"
-  | "close";
+  | "close"
+  | "noDataFound"
+  | "paginationLeftarrow"
+  | "paginationRightarrow"
+  | "search"
+  | "ascSorting"
+  | "descSorting"
+  | "sorting"
+  | "edit"
+  | "eye"
+  | "archive";
 
 type IconProps = {
   name: IconNameType;
@@ -54,7 +74,7 @@ const Icon = ({
     ...iIconStyle,
   };
   const renderIcon = (icon: IconNameType) => {
-    const iconProps = { ...restProps }; // No need to pass fill/stroke explicitly now
+    const iconProps = { ...restProps };
 
     switch (icon) {
       case "leftArrow":
@@ -73,6 +93,26 @@ const Icon = ({
         return <Dashbaord {...iconProps} />;
       case "close":
         return <Close {...iconProps} />;
+      case "noDataFound":
+        return <NoDataFound {...iconProps} />;
+      case "paginationLeftarrow":
+        return <PaginationLeftArrow {...iconProps} />;
+      case "paginationRightarrow":
+        return <PaginationRightArrow {...iconProps} />;
+      case "search":
+        return <Search {...iconProps} />;
+      case "ascSorting":
+        return <AscSorting {...iconProps} />;
+      case "descSorting":
+        return <DescSorting {...iconProps} />;
+      case "sorting":
+        return <Sorting {...iconProps} />;
+      case "edit":
+        return <Edit {...iconProps} />;
+      case "eye":
+        return <Eye {...iconProps} />;
+      case "archive":
+        return <Archive {...iconProps} />;
       default:
         return <></>;
     }

@@ -29,9 +29,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             : "w-[calc(100%-66px)]"
         }`}
       >
-        <div className="px-4 md:px-26px py-4 sm:py-5 h-[calc(100%-60px)] sm:h-[calc(100%-80px)] overflow-y-auto">
-          {children}
-        </div>
+        <div className="px-4 md:px-26px py-4 overflow-y-auto">{children}</div>
       </div>
     </div>
   );
