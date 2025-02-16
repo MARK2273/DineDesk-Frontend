@@ -13,7 +13,7 @@ import Close from "../../../assets/svg/Close.svg?react";
 import NoDataFound from "../../../assets/svg/NoDataFound.svg?react";
 import Search from "../../../assets/svg/Search.svg?react";
 import PaginationLeftArrow from "../../../assets/svg/PaginationLeftarrow.svg?react";
-import PaginationRightArrow from "../../../assets/svg/PaginationRightArrow.svg?react";
+import PaginationRightArrow from "../../../assets/svg/PaginationRightarrow.svg?react";
 import AscSorting from "../../../assets/svg/AscSorting.svg?react";
 import DescSorting from "../../../assets/svg/DescSorting.svg?react";
 import Sorting from "../../../assets/svg/Sorting.svg?react";
