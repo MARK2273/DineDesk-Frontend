@@ -37,39 +37,7 @@ const Menu = () => {
         />
       </div>
 
-      {/* List of Menus */}
-      {/* <div className="mt-4">
-        <h3 className="text-lg font-semibold mb-2">Menu List</h3>
-        {data?.length > 0 ? (
-          <ul className="space-y-2">
-            {data.map((menu: any) => (
-              <li
-                key={menu.id}
-                className="flex justify-between items-center bg-gray-100 p-3 rounded-lg"
-              >
-                <span className="text-gray-700">{menu.name}</span>
-                <Button
-                  title="Edit"
-                  onClick={() => {
-                    setSelectedMenu(menu);
-                    setOpenAddOrderModal(true);
-                  }}
-                  variant="filled"
-                  className="px-6 py-3 rounded-lg text-black cursor-pointer bg-blue-600"
-                />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-500">No menus available</p>
-        )}
-      </div> */}
-      <CustomTable
-        data={data}
-        columns={columns}
-        isLoading={isDataLoading}
-        // setTableInstance={setTableInstance}
-      />
+      <CustomTable data={data} columns={columns} isLoading={isDataLoading} />
 
       {/* Add/Edit Menu Modal */}
       {openAddOrderModal && (

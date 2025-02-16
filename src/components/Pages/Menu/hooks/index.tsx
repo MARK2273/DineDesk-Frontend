@@ -2,9 +2,11 @@ import { useArchiveMenu, useGetMenuList } from "@dine-desk/api/menu";
 import Icon from "@dine-desk/Common/Components/Icon";
 import { useTableManagement } from "@dine-desk/Common/Components/Table";
 import Tooltip from "@dine-desk/Common/Components/ToolTip";
+import { ROUTES } from "@dine-desk/constants/RoutePath";
 import { extractErrors } from "@dine-desk/helper";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export interface MenuManagementType {
   id: string;
@@ -12,6 +14,7 @@ export interface MenuManagementType {
 }
 const useMenuManagement = () => {
   const [openAddOrderModal, setOpenAddOrderModal] = useState<boolean>(false);
+  const navigate = useNavigate();
   const [
     openMenuArchiveConfirmationModal,
     setOpenMenuArchiveConfirmationModal,
@@ -80,6 +83,7 @@ const useMenuManagement = () => {
                 className="bg-green-100 hover:bg-green-500 p-2.5 rounded-lg w-10 h-10 flex items-center justify-center text-green-600 hover:text-white transition duration-300 ease-in-out"
                 onClick={() => {
                   console.log("view", row.original);
+                  navigate(ROUTES.VIEW_MENU.navigatePath(row.original.id));
                 }}
               >
                 <Icon name="eye" className="w-5 h-5" />
@@ -91,7 +95,6 @@ const useMenuManagement = () => {
               <button
                 className="bg-red-100 hover:bg-red-500 p-2.5 rounded-lg w-10 h-10 flex items-center justify-center text-red-600 hover:text-white transition duration-300 ease-in-out"
                 onClick={() => {
-                  console.log("delete", row.original);
                   setSelectedMenu(row.original);
                   setOpenMenuArchiveConfirmationModal(true);
                 }}
