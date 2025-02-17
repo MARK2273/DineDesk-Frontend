@@ -1,16 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   useCreateItem,
   useGetItemList,
-  // useUpdateItems,
+  useUpdateItems,
 } from "@dine-desk/api/item";
 import { useForm, useFieldArray } from "react-hook-form";
 import { ItamData, itemSchema } from "@dine-desk/schema/menu";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "@dine-desk/Common/Components/Button";
 import CheckboxField from "@dine-desk/Common/Components/FormField/CheckBoxField";
 import InputField from "@dine-desk/Common/Components/FormField/InputField";
+import { ROUTES } from "@dine-desk/constants/RoutePath";
 
 type MenuItem = {
   name: string;
@@ -18,25 +19,39 @@ type MenuItem = {
   category: string;
   description: string;
   available?: boolean;
+  menuId?: string;
 };
 
-const transformMenuData = (data: { items?: MenuItem[] }, menuId?: string) => {
+const transformMenuData = (
+  data: { items?: (MenuItem & { id?: string })[] },
+  menuId?: string
+) => {
   if (data.items && data.items.length > 0)
-    return data.items.map((item) => ({
-      menuId: menuId, // Assigning a static menuId, change this as needed
-      name: item.name,
-      price: parseFloat(item.price), // Convert price to a number
-      category: item.category,
-      description: item.description,
-      available: item.available || false,
-    }));
+    return data.items.map((item) => {
+      const transformedItem: MenuItem & { id?: string } = {
+        menuId,
+        name: item.name,
+        price: item.price, // Convert price to a number
+        category: item.category,
+        description: item.description,
+        available: item.available || false,
+      };
+      if (item.id) {
+        transformedItem.id = item.id;
+      }
+      return transformedItem;
+    });
 };
+
 const ViewMenu = () => {
   const { menuId } = useParams<{ menuId: string }>();
   const { data, isLoading, dataUpdatedAt } = useGetItemList(menuId);
-  // const [isEdit, setIsEdit] = useState(false);
-  const { mutateAsync: createItems } = useCreateItem();
-  // const { mutateAsync: updateItems } = useUpdateItems();
+  const [isEdit, setIsEdit] = useState(false);
+  const { mutateAsync: createItems, isPending: isItemCreatePending } =
+    useCreateItem();
+  const { mutateAsync: updateItems, isPending: isItemUpdatePending } =
+    useUpdateItems();
+  const navigate = useNavigate();
 
   const { register, control, handleSubmit, reset, formState, watch, setValue } =
     useForm<ItamData>({
@@ -50,10 +65,10 @@ const ViewMenu = () => {
   const { fields, append, remove } = useFieldArray({ control, name: "items" });
 
   useEffect(() => {
-    console.log(data);
     if (data) {
       reset({
-        items: data.map((item: MenuItem) => ({
+        items: data.map((item: MenuItem & { id?: string }) => ({
+          id: item.id,
           name: item.name,
           price: item.price.toString(),
           category: item.category,
@@ -62,17 +77,19 @@ const ViewMenu = () => {
         })),
       });
     }
-    // setIsEdit(data?.length > 0 ? true : false);
+    setIsEdit(data?.length > 0 ? true : false);
   }, [dataUpdatedAt, reset]);
 
   const onSubmit = async (data: ItamData) => {
     try {
       const finalData = transformMenuData(data, menuId);
-      // if (isEdit) {
-      // await updateItems(finalData);
-      // } else {
-      await createItems(finalData);
-      // }
+      if (isEdit) {
+        await updateItems(finalData);
+      } else {
+        await createItems(finalData);
+      }
+      navigate(ROUTES.MENU.path);
+      console.log({ finalData });
     } catch (error) {
       console.error(error);
       alert("Error adding items");
@@ -160,6 +177,7 @@ const ViewMenu = () => {
           variant="filled"
           title="Save"
           onClick={handleSubmit(onSubmit)}
+          isLoading={isItemCreatePending || isItemUpdatePending}
           className="px-6 py-3 cursor-pointer rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all"
         />
       </div>

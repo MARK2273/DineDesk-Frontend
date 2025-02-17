@@ -6,11 +6,12 @@ import { itemQueryKeyMap } from "./common/itemQueryKey";
 type AddUpdateItem =
   | {
       menuId?: string;
+      id?: string;
       name: string;
-      price: number;
+      price: string;
       category: string;
       description: string;
-      available: boolean;
+      available?: boolean;
     }[]
   | undefined;
 
