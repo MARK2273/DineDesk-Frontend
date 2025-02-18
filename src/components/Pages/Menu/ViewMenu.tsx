@@ -1,229 +1,78 @@
 import { useEffect, useState } from "react";
-import {
-  useCreateItem,
-  useGetItemList,
-  useUpdateItems,
-} from "@dine-desk/api/item";
-import { DndContext, closestCenter } from "@dnd-kit/core";
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { useForm, useFieldArray } from "react-hook-form";
-import { ItamData, itemSchema } from "@dine-desk/schema/menu";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useNavigate, useParams } from "react-router-dom";
-import Button from "@dine-desk/Common/Components/Button";
-import CheckboxField from "@dine-desk/Common/Components/FormField/CheckBoxField";
-import InputField from "@dine-desk/Common/Components/FormField/InputField";
-import { ROUTES } from "@dine-desk/constants/RoutePath";
+import { useGetItemList } from "@dine-desk/api/item";
+import { useParams } from "react-router-dom";
 import { Skeleton } from "@dine-desk/Common/Components/Skeleton";
-
-type MenuItem = {
-  name: string;
-  price: string;
-  category: string;
-  description: string;
-  available?: boolean;
-  menuId?: string;
-};
-
-const transformMenuData = (
-  data: { items?: (MenuItem & { id?: string })[] },
-  menuId?: string
-) => {
-  if (data.items && data.items.length > 0)
-    return data.items.map((item) => ({
-      ...item,
-      menuId,
-      available: item.available || false,
-    }));
-};
 
 const ViewMenu = () => {
   const { menuId } = useParams<{ menuId: string }>();
-  const { data, isLoading, dataUpdatedAt } = useGetItemList(menuId);
-  const [isEdit, setIsEdit] = useState(false);
-  const { mutateAsync: createItems, isPending: isItemCreatePending } =
-    useCreateItem();
-  const { mutateAsync: updateItems, isPending: isItemUpdatePending } =
-    useUpdateItems();
-  const navigate = useNavigate();
-
-  const { register, control, handleSubmit, reset, formState, watch, setValue } =
-    useForm<ItamData>({
-      defaultValues: { items: [] },
-      resolver: yupResolver(itemSchema),
-    });
-
-  const { errors } = formState;
-  const { fields, append, remove, move } = useFieldArray({
-    control,
-    name: "items",
-  });
+  const { data, isLoading } = useGetItemList(menuId);
+  const [groupedMenu, setGroupedMenu] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
     if (data) {
-      reset({
-        items: data.map((item: MenuItem & { id?: string }) => ({
-          ...item,
-          price: item.price.toString(),
-        })),
-      });
+      const grouped = data.reduce((acc: any, item: any) => {
+        acc[item.category] = acc[item.category] || [];
+        acc[item.category].push(item);
+        return acc;
+      }, {});
+      setGroupedMenu(grouped);
     }
-    setIsEdit(data?.length > 0);
-  }, [dataUpdatedAt, reset]);
-
-  const onSubmit = async (data: ItamData) => {
-    try {
-      const finalData = transformMenuData(data, menuId);
-      isEdit ? await updateItems(finalData) : await createItems(finalData);
-      navigate(ROUTES.MENU.path);
-    } catch (error) {
-      alert("Error adding items");
-    }
-  };
-
-  const handleDragEnd = (event: any) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = fields.findIndex((item) => item.id === active.id);
-    const newIndex = fields.findIndex((item) => item.id === over.id);
-
-    move(oldIndex, newIndex);
-  };
+  }, [data]);
 
   return (
-    <div className="bg-white shadow-lg rounded-xl p-6 max-w-4xl mx-auto">
-      <div className="flex flex-col sm:flex-row items-center justify-between border-b pb-4">
-        <h4 className="text-xl font-semibold">Add Items</h4>
-        <Button
-          variant="filled"
-          onClick={() =>
-            append({
-              name: "",
-              price: "",
-              category: "",
-              description: "",
-              available: false,
-            })
-          }
-          title="Add Item"
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white text-sm"
-        />
-      </div>
-      <div className="mt-6">
+    <div className="min-h-screen bg-gray-50 p-6 font-sans">
+      <header className="bg-white fixed top-0 left-0 w-full shadow-md py-5 px-6 flex items-center justify-between z-10">
+        <h1 className="text-2xl font-bold text-gray-800">📜 Menu</h1>
+      </header>
+
+      <div className="mt-20 space-y-10">
         {isLoading ? (
-          <div className="space-y-4">
-            {[...Array(3)].map((_, index) => (
-              <Skeleton key={index} className="h-16 w-full rounded-lg" />
-            ))}
+          <div className="space-y-6">
+            <Skeleton count={4} className="h-28 w-full rounded-lg" />
           </div>
         ) : (
-          <DndContext
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext items={fields.map((field) => field.id)}>
-              <div className="space-y-4">
-                {fields.map((field, index) => (
-                  <DraggableRow
-                    key={field.id}
-                    field={field}
-                    index={index}
-                    register={register}
-                    remove={remove}
-                    watch={watch}
-                    setValue={setValue}
-                    errors={errors}
-                  />
+          Object.keys(groupedMenu).map((category) => (
+            <div key={category} className="space-y-6">
+              <h2 className="text-xl font-bold text-gray-700 mb-3 border-b-2 pb-2 border-gray-300">
+                {category}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {groupedMenu[category].map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ease-in-out p-5 border border-gray-200"
+                  >
+                    <div className="flex flex-col justify-between h-full space-y-3">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          {item.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-lg font-bold text-gray-900">
+                          ₹{item.price}
+                        </p>
+                        {item.available ? (
+                          <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
+                            Available
+                          </span>
+                        ) : (
+                          <span className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700">
+                            Out of Stock
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
-            </SortableContext>
-          </DndContext>
+            </div>
+          ))
         )}
-        {/* Save Button */}
-        <Button
-          variant="filled"
-          title="Save"
-          onClick={handleSubmit(onSubmit)}
-          isLoading={isItemCreatePending || isItemUpdatePending}
-          className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg cursor-pointer"
-        />
       </div>
-    </div>
-  );
-};
-
-const DraggableRow = ({
-  index,
-  register,
-  remove,
-  watch,
-  setValue,
-  errors,
-  field,
-}: any) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: field.id });
-  const style = { transform: CSS.Transform.toString(transform), transition };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      className="flex flex-col sm:flex-row items-center gap-4 p-4 border rounded-lg bg-gray-50 shadow-md"
-    >
-      <span {...listeners} className="text-lg font-bold cursor-grab">
-        ☰
-      </span>
-      <CheckboxField
-        id={`items.${index}.available`}
-        label=""
-        checked={watch(`items.${index}.available`)}
-        onChange={(e) =>
-          setValue(`items.${index}.available`, e.target.checked, {
-            shouldValidate: true,
-          })
-        }
-        className="mt-1"
-      />
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 w-full">
-        <InputField
-          label="Name"
-          name={`items.${index}.name`}
-          register={register}
-          error={errors?.items?.[index]?.name?.message}
-          placeholder="Enter Name"
-        />
-        <InputField
-          label="Price"
-          name={`items.${index}.price`}
-          register={register}
-          error={errors?.items?.[index]?.price?.message}
-          placeholder="Enter Price"
-        />
-        <InputField
-          label="Category"
-          name={`items.${index}.category`}
-          register={register}
-          error={errors?.items?.[index]?.category?.message}
-          placeholder="Enter Category"
-        />
-        <InputField
-          label="Description"
-          name={`items.${index}.description`}
-          register={register}
-          error={errors?.items?.[index]?.description?.message}
-          placeholder="Enter Description"
-        />
-      </div>
-      <Button
-        variant="filled"
-        title="Remove"
-        onClick={() => remove(index)}
-        className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm"
-      />
     </div>
   );
 };

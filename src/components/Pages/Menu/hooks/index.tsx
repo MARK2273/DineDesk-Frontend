@@ -83,7 +83,7 @@ const useMenuManagement = () => {
                 className="bg-green-100 hover:bg-green-500 p-2.5 rounded-lg w-10 h-10 flex items-center justify-center text-green-600 hover:text-white transition duration-300 ease-in-out"
                 onClick={() => {
                   console.log("view", row.original);
-                  navigate(ROUTES.VIEW_MENU.navigatePath(row.original.id));
+                  navigate(ROUTES.ADD_EDIT_MENU.navigatePath(row.original.id));
                 }}
               >
                 <Icon name="eye" className="w-5 h-5" />

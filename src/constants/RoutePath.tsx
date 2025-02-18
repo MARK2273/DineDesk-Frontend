@@ -7,7 +7,8 @@ import Report from "../components/Pages/Report";
 import Order from "../components/Pages/Order";
 import Login from "../components/Pages/Login";
 import Root from "../components/Pages/Root";
-import ViewMenu from "../components/Pages/Menu/ViewMenu";
+import AddEditItem from "../components/Pages/Menu/AddEditItem";
+import ViewMenu from "@dine-desk/components/Pages/Menu/ViewMenu";
 
 // import NotFound from "@dine-desk/Common/Components/NotFound";
 
@@ -21,6 +22,7 @@ export type RoutesType = {
     | "NOT_FOUND"
     | "DASHBOARD"
     | "MENU"
+    | "ADD_EDIT_MENU"
     | "VIEW_MENU"
     | "REPORT"
     | "ORDER"
@@ -34,7 +36,7 @@ export type RoutesType = {
     errorElement?: RouteObject["errorElement"];
   };
 } & {
-  [key in "VIEW_MENU"]: {
+  [key in "ADD_EDIT_MENU" | "VIEW_MENU"]: {
     navigatePath: (id: number | string) => string;
   };
 };
@@ -59,12 +61,21 @@ export const ROUTES: RoutesType = {
     showFooter: true,
     element: <Menu />,
   },
-  VIEW_MENU: {
+  ADD_EDIT_MENU: {
     path: "/menu/:menuId",
     navigatePath: (menuId) => `/menu/${menuId}`,
     routeType: "authenticate",
     showHeader: true,
     showFooter: true,
+    headerName: "Add Edit Menu",
+    element: <AddEditItem />,
+  },
+  VIEW_MENU: {
+    path: "/view-menu/:menuId",
+    navigatePath: (menuId) => `/view-menu/${menuId}`,
+    routeType: "public",
+    showHeader: false,
+    showFooter: false,
     headerName: "View menu",
     element: <ViewMenu />,
   },
