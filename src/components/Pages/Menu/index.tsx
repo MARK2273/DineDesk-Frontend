@@ -3,6 +3,7 @@ import Button from "@dine-desk/Common/Components/Button";
 import CustomTable from "@dine-desk/Common/Components/Table";
 import useMenuManagement from "./hooks";
 import { ConfirmModal } from "@dine-desk/Common/Components/Modal";
+import ViewQR from "./ViewQR";
 
 const Menu = () => {
   const {
@@ -15,6 +16,8 @@ const Menu = () => {
     setSelectedMenu,
     openMenuArchiveConfirmationModal,
     setOpenMenuArchiveConfirmationModal,
+    openQRModal,
+    setOpenQRModal,
     handleConfirmArchiveModal,
     handleToggleModal,
     isMenuArchivePending,
@@ -36,8 +39,15 @@ const Menu = () => {
           className="px-6 py-3 rounded-lg text-black cursor-pointer bg-blue-600"
         />
       </div>
-
-      <CustomTable data={data} columns={columns} isLoading={isDataLoading} />
+      <div className="w-full overflow-x-auto">
+        <div className="min-w-[300px]">
+          <CustomTable
+            data={data}
+            columns={columns}
+            isLoading={isDataLoading}
+          />
+        </div>
+      </div>
 
       {/* Add/Edit Menu Modal */}
       {openAddOrderModal && (
@@ -48,6 +58,18 @@ const Menu = () => {
           }}
           open={openAddOrderModal}
           isEdit={!!selectedMenu}
+          id={selectedMenu?.id}
+        />
+      )}
+
+      {/* View QR Modal*/}
+      {openQRModal && (
+        <ViewQR
+          onClose={() => {
+            setOpenQRModal(false);
+            setSelectedMenu(null);
+          }}
+          open={openQRModal}
           id={selectedMenu?.id}
         />
       )}

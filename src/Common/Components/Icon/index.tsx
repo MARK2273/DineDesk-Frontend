@@ -19,6 +19,7 @@ import DescSorting from "../../../assets/svg/DescSorting.svg?react";
 import Sorting from "../../../assets/svg/Sorting.svg?react";
 import Edit from "../../../assets/svg/Edit.svg?react";
 import Eye from "../../../assets/svg/Eye.svg?react";
+import QRCode from "../../../assets/svg/QRCode.svg?react";
 import Archive from "../../../assets/svg/Archive.svg?react";
 import Image from "../Image";
 import SectionLoader from "../Loader/Spinner";
@@ -41,6 +42,7 @@ export type IconNameType =
   | "sorting"
   | "edit"
   | "eye"
+  | "QRCode"
   | "archive";
 
 type IconProps = {
@@ -113,6 +115,8 @@ const Icon = ({
         return <Eye {...iconProps} />;
       case "archive":
         return <Archive {...iconProps} />;
+      case "QRCode":
+        return <QRCode {...iconProps} />;
       default:
         return <></>;
     }
