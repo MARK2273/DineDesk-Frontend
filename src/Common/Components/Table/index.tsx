@@ -87,7 +87,7 @@ export const CustomTable = <T,>({
                 ))}
               </tr>
             ))
-          ) : data.length > 0 ? (
+          ) : data?.length > 0 ? (
             table.getRowModel().rows.map((row) => (
               <tr
                 key={row.id}

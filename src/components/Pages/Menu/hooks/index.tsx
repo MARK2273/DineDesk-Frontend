@@ -19,6 +19,7 @@ const useMenuManagement = () => {
     openMenuArchiveConfirmationModal,
     setOpenMenuArchiveConfirmationModal,
   ] = useState(false);
+  const [openQRModal, setOpenQRModal] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState<any>(null);
   const { apiData } = useTableManagement<MenuManagementType, object>({
     apiCall: useGetMenuList,
@@ -67,7 +68,7 @@ const useMenuManagement = () => {
           <div className="flex items-center justify-self-auto gap-2">
             <Tooltip content="Edit" placement="top">
               <button
-                className="bg-blue-100 hover:bg-blue-500 p-2.5 rounded-lg w-10 h-10 flex items-center justify-center text-blue-500 hover:text-white transition duration-300 ease-in-out"
+                className="bg-blue-100 hover:bg-blue-500 p-2.5 rounded-lg w-10 h-10 flex items-center justify-center text-blue-500 hover:text-white transition duration-300 ease-in-out cursor-pointer"
                 onClick={() => {
                   setOpenAddOrderModal(true);
                   setSelectedMenu(row.original);
@@ -80,7 +81,7 @@ const useMenuManagement = () => {
             {/* View Button */}
             <Tooltip content="View" placement="top">
               <button
-                className="bg-green-100 hover:bg-green-500 p-2.5 rounded-lg w-10 h-10 flex items-center justify-center text-green-600 hover:text-white transition duration-300 ease-in-out"
+                className="cursor-pointer bg-green-100 hover:bg-green-500 p-2.5 rounded-lg w-10 h-10 flex items-center justify-center text-green-600 hover:text-white transition duration-300 ease-in-out"
                 onClick={() => {
                   console.log("view", row.original);
                   navigate(ROUTES.ADD_EDIT_MENU.navigatePath(row.original.id));
@@ -93,13 +94,26 @@ const useMenuManagement = () => {
             {/* Archive Button */}
             <Tooltip content="Archive" placement="top">
               <button
-                className="bg-red-100 hover:bg-red-500 p-2.5 rounded-lg w-10 h-10 flex items-center justify-center text-red-600 hover:text-white transition duration-300 ease-in-out"
+                className="cursor-pointer bg-red-100 hover:bg-red-500 p-2.5 rounded-lg w-10 h-10 flex items-center justify-center text-red-600 hover:text-white transition duration-300 ease-in-out"
                 onClick={() => {
                   setSelectedMenu(row.original);
                   setOpenMenuArchiveConfirmationModal(true);
                 }}
               >
                 <Icon name="archive" className="w-5 h-5" />
+              </button>
+            </Tooltip>
+
+            {/* View Menu Items */}
+            <Tooltip content="QR Code" placement="top">
+              <button
+                className="cursor-pointer bg-gray-200 hover:bg-gray-800 p-2.5 rounded-lg w-10 h-10 flex items-center justify-center text-gray-800 hover:text-white transition duration-300 ease-in-out shadow-md"
+                onClick={() => {
+                  setSelectedMenu(row.original);
+                  setOpenQRModal(true);
+                }}
+              >
+                <Icon name="QRCode" className="w-5 h-5" />
               </button>
             </Tooltip>
           </div>
@@ -119,6 +133,8 @@ const useMenuManagement = () => {
     setSelectedMenu,
     openMenuArchiveConfirmationModal,
     setOpenMenuArchiveConfirmationModal,
+    openQRModal,
+    setOpenQRModal,
     handleConfirmArchiveModal,
     handleToggleModal,
     isMenuArchivePending,
