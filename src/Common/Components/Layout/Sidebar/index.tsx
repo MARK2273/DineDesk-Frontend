@@ -11,7 +11,7 @@ interface SidebarProps {
 }
 
 const menuItems: { icon: IconNameType; label: string; path: string }[] = [
-  { icon: "dashbaord", label: "Dashboard", path: ROUTES.DASHBOARD.path },
+  { icon: "dashboard", label: "Dashboard", path: ROUTES.DASHBOARD.path },
   { icon: "menu", label: "Menu", path: ROUTES.MENU.path },
   { icon: "order", label: "Orders", path: ROUTES.ORDER.path },
   { icon: "report", label: "Repors", path: ROUTES.REPORT.path },
@@ -34,7 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div
       className={clsx(
-        "fixed z-20 bg-white h-full transition-all duration-300 ease-in-out",
+        "fixed z-20 bg-gray-100 h-full transition-all duration-300 ease-in-out",
         isSidebarOpen ? "w-64" : "w-16"
       )}
     >

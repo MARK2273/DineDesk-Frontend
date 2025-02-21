@@ -31,7 +31,7 @@ export type IconNameType =
   | "menu"
   | "order"
   | "report"
-  | "dashbaord"
+  | "dashboard"
   | "close"
   | "noDataFound"
   | "paginationLeftarrow"
@@ -91,7 +91,7 @@ const Icon = ({
         return <Order {...iconProps} />;
       case "report":
         return <Report {...iconProps} />;
-      case "dashbaord":
+      case "dashboard":
         return <Dashbaord {...iconProps} />;
       case "close":
         return <Close {...iconProps} />;
