@@ -168,11 +168,18 @@ const DraggableRow = ({
   return (
     <div
       ref={setNodeRef}
-      style={{ ...style, touchAction: "none" }}
+      style={style}
       {...attributes}
-      {...listeners}
-      className="flex flex-col sm:flex-row items-center gap-4 p-4 border rounded-lg bg-gray-50 shadow-md cursor-grab"
+      className="flex flex-col sm:flex-row items-center gap-4 p-4 border rounded-lg bg-gray-50 shadow-md"
     >
+      <span
+        {...listeners}
+        className="text-lg font-bold cursor-grab"
+        style={{ touchAction: "none" }}
+        // onPointerDown={(e) => e.preventDefault()} // Prevent scrolling
+      >
+        ☰
+      </span>
       <CheckboxField
         id={`items.${index}.available`}
         label=""
