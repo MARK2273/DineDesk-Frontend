@@ -107,7 +107,7 @@ const useMenuManagement = () => {
             {/* View Menu Items */}
             <Tooltip content="QR Code" placement="top">
               <button
-                className="cursor-pointer bg-gray-200 hover:bg-gray-800 p-2.5 rounded-lg w-10 h-10 flex items-center justify-center text-gray-800 hover:text-white transition duration-300 ease-in-out shadow-md"
+                className="cursor-pointer bg-gray-200 hover:bg-gray-800 p-2.5 rounded-lg w-10 h-10 flex items-center justify-center text-gray-800 hover:text-white transition duration-300 ease-in-out"
                 onClick={() => {
                   setSelectedMenu(row.original);
                   setOpenQRModal(true);
