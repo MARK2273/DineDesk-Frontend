@@ -7,7 +7,16 @@ import {
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useForm, useFieldArray } from "react-hook-form";
+import {
+  useForm,
+  useFieldArray,
+  FieldArrayWithId,
+  UseFormRegister,
+  UseFieldArrayRemove,
+  UseFormWatch,
+  UseFormSetValue,
+  FieldErrors,
+} from "react-hook-form";
 import { ItamData, itemSchema } from "@dine-desk/schema/menu";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate, useParams } from "react-router-dom";
@@ -17,17 +26,42 @@ import InputField from "@dine-desk/Common/Components/FormField/InputField";
 import { ROUTES } from "@dine-desk/constants/RoutePath";
 import { Skeleton } from "@dine-desk/Common/Components/Skeleton";
 
-type MenuItem = {
+type MenuItemType = {
+  available?: boolean | undefined;
   name: string;
   price: string;
   category: string;
   description: string;
-  available?: boolean;
   menuId?: string;
+  id?: string;
+};
+
+type DraggableRowProps = {
+  field: FieldArrayWithId<
+    {
+      items?: MenuItemType[] | undefined;
+    },
+    "items",
+    "id"
+  >;
+  index: number;
+  register: UseFormRegister<{
+    items?: MenuItemType[] | undefined;
+  }>;
+  remove: UseFieldArrayRemove;
+  watch: UseFormWatch<{
+    items?: MenuItemType[] | undefined;
+  }>;
+  setValue: UseFormSetValue<{
+    items?: MenuItemType[] | undefined;
+  }>;
+  errors: FieldErrors<{
+    items?: MenuItemType[] | undefined;
+  }>;
 };
 
 const transformMenuData = (
-  data: { items?: (MenuItem & { id?: string })[] },
+  data: { items?: MenuItemType[] },
   menuId?: string
 ) => {
   if (data.items && data.items.length > 0)
@@ -63,7 +97,7 @@ const AddEditItem = () => {
   useEffect(() => {
     if (data) {
       reset({
-        items: data.map((item: MenuItem & { id?: string }) => ({
+        items: data.map((item: MenuItemType) => ({
           ...item,
           price: item.price.toString(),
         })),
@@ -160,7 +194,7 @@ const DraggableRow = ({
   setValue,
   errors,
   field,
-}: any) => {
+}: DraggableRowProps) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: field.id });
   const style = { transform: CSS.Transform.toString(transform), transition };

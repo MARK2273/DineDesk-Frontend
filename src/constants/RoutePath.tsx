@@ -5,10 +5,11 @@ import Dashboard from "../components/Pages/Dashboard";
 import Menu from "../components/Pages/Menu";
 import Report from "../components/Pages/Report";
 import Order from "../components/Pages/Order";
-import Login from "../components/Pages/Login";
+import Login from "../components/Pages/Login/Login";
 import Root from "../components/Pages/Root";
 import AddEditItem from "../components/Pages/Menu/AddEditItem";
 import ViewMenu from "@dine-desk/components/Pages/Menu/ViewMenu";
+import Register from "@dine-desk/components/Pages/Login/Register";
 
 // import NotFound from "@dine-desk/Common/Components/NotFound";
 
@@ -26,7 +27,8 @@ export type RoutesType = {
     | "VIEW_MENU"
     | "REPORT"
     | "ORDER"
-    | "LOGIN"]: {
+    | "LOGIN"
+    | "REGISTER"]: {
     path: string;
     headerName?: string;
     routeType: "public" | "authenticate" | "un-authenticate";
@@ -92,6 +94,13 @@ export const ROUTES: RoutesType = {
     showHeader: true,
     showFooter: true,
     element: <Order />,
+  },
+  REGISTER: {
+    path: "/register",
+    routeType: "un-authenticate",
+    showHeader: true,
+    showFooter: true,
+    element: <Register />,
   },
   LOGIN: {
     path: "/login",

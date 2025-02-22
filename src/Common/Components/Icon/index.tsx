@@ -21,6 +21,9 @@ import Edit from "../../../assets/svg/Edit.svg?react";
 import Eye from "../../../assets/svg/Eye.svg?react";
 import QRCode from "../../../assets/svg/QRCode.svg?react";
 import Archive from "../../../assets/svg/Archive.svg?react";
+import PasswordVisible from "../../../assets/svg/PasswordVisible.svg?react";
+import PasswordEye from "../../../assets/svg/PasswordEye.svg?react";
+import Logout from "../../../assets/svg/Logout.svg?react";
 import Image from "../Image";
 import SectionLoader from "../Loader/Spinner";
 
@@ -43,7 +46,10 @@ export type IconNameType =
   | "edit"
   | "eye"
   | "QRCode"
-  | "archive";
+  | "archive"
+  | "passwordVisible"
+  | "passwordEye"
+  | "logout";
 
 type IconProps = {
   name: IconNameType;
@@ -117,6 +123,12 @@ const Icon = ({
         return <Archive {...iconProps} />;
       case "QRCode":
         return <QRCode {...iconProps} />;
+      case "passwordVisible":
+        return <PasswordVisible {...iconProps} />;
+      case "passwordEye":
+        return <PasswordEye {...iconProps} />;
+      case "logout":
+        return <Logout {...iconProps} />;
       default:
         return <></>;
     }

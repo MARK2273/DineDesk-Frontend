@@ -9,6 +9,7 @@ import { ROUTES } from "../constants/RoutePath";
 import ErrorElement from "../Common/Components/ErrorBoundary/ErrorElement";
 import AppLayout from "../Common/Components/Layout";
 import ErrorBoundary from "../Common/Components/ErrorBoundary";
+import AuthenticateRoute from "./RouteGuard/AuthenticateRoute";
 
 const applySuspense = (routes: RouteObject[]): RouteObject[] => {
   return routes.map((route) => ({
@@ -30,17 +31,17 @@ export const RoutesArray: RouteObject[] = applySuspense([
     if (route.routeType === "authenticate") {
       routeObj["element"] = (
         <>
-          {/* <AuthenticateRoute> */}
-          {ROUTES.DEFAULT.path !== route.path ? (
-            <AppLayout>
-              <ErrorBoundary path={ROUTES.DASHBOARD.path}>
-                {route.element}
-              </ErrorBoundary>
-            </AppLayout>
-          ) : (
-            <>{route.element}</>
-          )}
-          {/* </AuthenticateRoute> */}
+          <AuthenticateRoute>
+            {ROUTES.DEFAULT.path !== route.path ? (
+              <AppLayout>
+                <ErrorBoundary path={ROUTES.DASHBOARD.path}>
+                  {route.element}
+                </ErrorBoundary>
+              </AppLayout>
+            ) : (
+              <>{route.element}</>
+            )}
+          </AuthenticateRoute>
         </>
       );
     } else if (route.routeType === "un-authenticate") {
