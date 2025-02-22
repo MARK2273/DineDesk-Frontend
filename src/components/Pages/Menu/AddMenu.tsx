@@ -6,6 +6,8 @@ import InputField from "@dine-desk/Common/Components/FormField/InputField";
 import Modal from "@dine-desk/Common/Components/Modal";
 import { useCreateMenu, useGetMenu, useUpdateMenu } from "@dine-desk/api/menu";
 import { useEffect } from "react";
+import { dispatchToast } from "@dine-desk/helper/toastHelper";
+import { extractErrors } from "@dine-desk/helper";
 
 interface AddEditMenuModalProps {
   open: boolean;
@@ -41,12 +43,17 @@ const AddEditMenu: React.FC<AddEditMenuModalProps> = ({
     try {
       if (isEdit) {
         await updateMenu(data);
+        dispatchToast("success", "Menu updated successfully");
       } else {
         await createMenu(data);
+        dispatchToast("success", "Menu created successfully");
       }
       reset();
       onClose();
-    } catch (error) {}
+    } catch (error: any) {
+      const errors = extractErrors(error);
+      dispatchToast("error", errors || "Something went wrong");
+    }
   };
 
   return (

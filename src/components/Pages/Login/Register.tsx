@@ -3,6 +3,8 @@ import Button from "@dine-desk/Common/Components/Button";
 import InputField from "@dine-desk/Common/Components/FormField/InputField";
 import PasswordField from "@dine-desk/Common/Components/FormField/PasswordField";
 import { ROUTES } from "@dine-desk/constants/RoutePath";
+import { extractErrors } from "@dine-desk/helper";
+import { dispatchToast } from "@dine-desk/helper/toastHelper";
 import { registerData, registerSchema } from "@dine-desk/schema/login";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -24,9 +26,11 @@ const Register = () => {
   const onSubmit = async (data: registerData) => {
     try {
       await registerUser(data);
+      dispatchToast("success", "User registered successfully");
       navigate(ROUTES.DASHBOARD.path);
-    } catch (error) {
-      console.error("Error registering user:", error);
+    } catch (error: any) {
+      const errors: any = extractErrors(error);
+      dispatchToast("error", errors || "Something went wrong");
     }
   };
 

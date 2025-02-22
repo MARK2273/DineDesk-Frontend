@@ -25,6 +25,8 @@ import CheckboxField from "@dine-desk/Common/Components/FormField/CheckBoxField"
 import InputField from "@dine-desk/Common/Components/FormField/InputField";
 import { ROUTES } from "@dine-desk/constants/RoutePath";
 import { Skeleton } from "@dine-desk/Common/Components/Skeleton";
+import { dispatchToast } from "@dine-desk/helper/toastHelper";
+import { extractErrors } from "@dine-desk/helper";
 
 type MenuItemType = {
   available?: boolean | undefined;
@@ -109,10 +111,17 @@ const AddEditItem = () => {
   const onSubmit = async (data: ItamData) => {
     try {
       const finalData = transformMenuData(data, menuId);
-      isEdit ? await updateItems(finalData) : await createItems(finalData);
+      if (isEdit) {
+        await updateItems(finalData);
+        dispatchToast("success", "Menu updated successfully");
+      } else {
+        await createItems(finalData);
+        dispatchToast("success", "Menu created successfully");
+      }
       navigate(ROUTES.MENU.path);
-    } catch (error) {
-      alert("Error adding items");
+    } catch (error: any) {
+      const errors = extractErrors(error);
+      dispatchToast("error", errors || "Something went wrong");
     }
   };
 

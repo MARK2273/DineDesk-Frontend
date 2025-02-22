@@ -4,6 +4,7 @@ import { useTableManagement } from "@dine-desk/Common/Components/Table";
 import Tooltip from "@dine-desk/Common/Components/ToolTip";
 import { ROUTES } from "@dine-desk/constants/RoutePath";
 import { extractErrors } from "@dine-desk/helper";
+import { dispatchToast } from "@dine-desk/helper/toastHelper";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -37,13 +38,12 @@ const useMenuManagement = () => {
   const handleConfirmArchiveModal = async (id: number) => {
     try {
       await archiveMenu(+id);
+      dispatchToast("success", "Order archived successfully");
       handleToggleModal(setOpenMenuArchiveConfirmationModal);
-      // dispatchToast(res?.message || "Order archived successfully", "success");
       setSelectedMenu(null);
     } catch (error: any) {
       const errors = extractErrors(error);
-      console.log(errors);
-      // dispatchToast(errors, "error");
+      dispatchToast("error", errors || "Something went wrong");
     }
   };
 
@@ -83,7 +83,6 @@ const useMenuManagement = () => {
               <button
                 className="cursor-pointer bg-green-100 hover:bg-green-500 p-2.5 rounded-lg w-10 h-10 flex items-center justify-center text-green-600 hover:text-white transition duration-300 ease-in-out"
                 onClick={() => {
-                  console.log("view", row.original);
                   navigate(ROUTES.ADD_EDIT_MENU.navigatePath(row.original.id));
                 }}
               >
