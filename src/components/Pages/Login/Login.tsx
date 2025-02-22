@@ -3,7 +3,9 @@ import Button from "@dine-desk/Common/Components/Button";
 import InputField from "@dine-desk/Common/Components/FormField/InputField";
 import PasswordField from "@dine-desk/Common/Components/FormField/PasswordField";
 import { ROUTES } from "@dine-desk/constants/RoutePath";
+import { extractErrors } from "@dine-desk/helper";
 import { storageHelper } from "@dine-desk/helper/storageHelper";
+import { dispatchToast } from "@dine-desk/helper/toastHelper";
 import { loginData, loginSchema } from "@dine-desk/schema/login";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -24,12 +26,14 @@ const Login = () => {
   const onSubmit = async (data: loginData) => {
     try {
       const loginData = await loginUser(data);
+      dispatchToast("success", "Login successful");
       const storage = storageHelper("session");
       if (loginData) storage.setItem("token", loginData.token);
 
       navigate(ROUTES.DASHBOARD.path);
-    } catch (error) {
-      console.error("Error logging in:", error);
+    } catch (error: any) {
+      const errors = extractErrors(error);
+      dispatchToast("error", errors || "Something went wrong");
     }
   };
 
