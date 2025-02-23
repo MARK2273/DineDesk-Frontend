@@ -6,6 +6,7 @@ import LeftArrow from "../../../assets/svg/LeftArrow.svg?react";
 import Errorsvg from "../../../assets/svg/Errorsvg.svg?react";
 import Home from "../../../assets/svg/Home.svg?react";
 import Menu from "../../../assets/svg/Menu.svg?react";
+import Restaurant from "../../../assets/svg/Restaurant.svg?react";
 import Order from "../../../assets/svg/Order.svg?react";
 import Dashbaord from "../../../assets/svg/Dashbaord.svg?react";
 import Report from "../../../assets/svg/Report.svg?react";
@@ -32,6 +33,7 @@ export type IconNameType =
   | "errorsvg"
   | "home"
   | "menu"
+  | "restaurant"
   | "order"
   | "report"
   | "dashboard"
@@ -129,6 +131,8 @@ const Icon = ({
         return <PasswordEye {...iconProps} />;
       case "logout":
         return <Logout {...iconProps} />;
+      case "restaurant":
+        return <Restaurant {...iconProps} />;
       default:
         return <></>;
     }

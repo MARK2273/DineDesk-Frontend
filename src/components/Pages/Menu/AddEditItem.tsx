@@ -27,6 +27,7 @@ import { ROUTES } from "@dine-desk/constants/RoutePath";
 import { Skeleton } from "@dine-desk/Common/Components/Skeleton";
 import { dispatchToast } from "@dine-desk/helper/toastHelper";
 import { extractErrors } from "@dine-desk/helper";
+import SectionLoader from "@dine-desk/Common/Components/Loader/Spinner";
 
 type MenuItemType = {
   available?: boolean | undefined;
@@ -134,6 +135,10 @@ const AddEditItem = () => {
 
     move(oldIndex, newIndex);
   };
+
+  if (isLoading) {
+    return <SectionLoader />;
+  }
 
   return (
     <div className="bg-white shadow-lg rounded-xl p-6 max-w-4xl mx-auto">
