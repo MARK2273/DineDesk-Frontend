@@ -1,6 +1,7 @@
 import { PropsWithChildren, useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import clsx from "clsx";
+import Header from "./Header";
 
 type AppLayoutProps = PropsWithChildren;
 
@@ -31,6 +32,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             : "ml-16 w-[calc(100%-16px)]"
         )}
       >
+        <Header />
         <div className="px-4 md:px-26px py-4 overflow-y-auto">{children}</div>
       </div>
     </div>

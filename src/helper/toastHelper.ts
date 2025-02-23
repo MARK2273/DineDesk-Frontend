@@ -8,6 +8,7 @@ const toastConfig: ToastOptions = {
   closeOnClick: true,
   pauseOnHover: false,
   theme: "dark",
+  closeButton: false,
 };
 
 export const dispatchToast = (

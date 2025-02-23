@@ -3,6 +3,7 @@ import { RouteObject } from "react-router-dom";
 import NotFound from "../Common/Components/NotFound";
 import Dashboard from "../components/Pages/Dashboard";
 import Menu from "../components/Pages/Menu";
+import Restaurant from "../components/Pages/Restaurant";
 import Report from "../components/Pages/Report";
 import Order from "../components/Pages/Order";
 import Login from "../components/Pages/Login/Login";
@@ -23,6 +24,7 @@ export type RoutesType = {
     | "NOT_FOUND"
     | "DASHBOARD"
     | "MENU"
+    | "RESTAURANT"
     | "ADD_EDIT_MENU"
     | "VIEW_MENU"
     | "REPORT"
@@ -62,6 +64,13 @@ export const ROUTES: RoutesType = {
     showHeader: true,
     showFooter: true,
     element: <Menu />,
+  },
+  RESTAURANT: {
+    path: "/restaurant",
+    routeType: "authenticate",
+    showHeader: true,
+    showFooter: true,
+    element: <Restaurant />,
   },
   ADD_EDIT_MENU: {
     path: "/menu/:menuId",
