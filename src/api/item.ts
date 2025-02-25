@@ -12,6 +12,7 @@ type AddUpdateItem =
       category: string;
       description: string;
       available?: boolean;
+      restaurantId?: string;
     }[]
   | undefined;
 

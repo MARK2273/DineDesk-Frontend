@@ -8,7 +8,7 @@ export const useCreateMenu = () => {
   const { invalidate } = useInvalidateQuery();
   return useMutation({
     mutationKey: ["addMenu"],
-    mutationFn: async (data: MenuData) => {
+    mutationFn: async (data: MenuData & { restaurantId: string }) => {
       const res = await axiosPost("/menu", {
         data: data,
         headers: {
@@ -47,7 +47,7 @@ export const useUpdateMenu = (id: string | number | undefined) => {
   const { invalidate } = useInvalidateQuery();
   return useMutation({
     mutationKey: ["updateMenu", id],
-    mutationFn: async (data: MenuData) => {
+    mutationFn: async (data: MenuData & { restaurantId: string }) => {
       const res = await axiosPut(`/menu/${id}`, {
         data: data,
         headers: {

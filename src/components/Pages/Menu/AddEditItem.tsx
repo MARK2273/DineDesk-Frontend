@@ -28,6 +28,7 @@ import { Skeleton } from "@dine-desk/Common/Components/Skeleton";
 import { dispatchToast } from "@dine-desk/helper/toastHelper";
 import { extractErrors } from "@dine-desk/helper";
 import SectionLoader from "@dine-desk/Common/Components/Loader/Spinner";
+import { storageHelper } from "@dine-desk/helper/storageHelper";
 
 type MenuItemType = {
   available?: boolean | undefined;
@@ -65,12 +66,14 @@ type DraggableRowProps = {
 
 const transformMenuData = (
   data: { items?: MenuItemType[] },
-  menuId?: string
+  menuId?: string,
+  restaurantId?: string
 ) => {
   if (data.items && data.items.length > 0)
     return data.items.map((item) => ({
       ...item,
       menuId,
+      restaurantId,
       available: item.available || false,
     }));
 };
@@ -111,7 +114,13 @@ const AddEditItem = () => {
 
   const onSubmit = async (data: ItamData) => {
     try {
-      const finalData = transformMenuData(data, menuId);
+      const storage = storageHelper("session");
+      const restaurantId = storage.getItem("restaurantId");
+      if (!restaurantId) {
+        dispatchToast("error", "Please select a restaurant");
+        return;
+      }
+      const finalData = transformMenuData(data, menuId, restaurantId);
       if (isEdit) {
         await updateItems(finalData);
         dispatchToast("success", "Menu updated successfully");
