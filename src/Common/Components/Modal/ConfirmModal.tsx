@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { ReactNode } from "react";
 import Modal, { ModalProps } from ".";
 import Button from "../Button";
-import { IconNameType } from "../Icon";
+import Icon, { IconNameType } from "../Icon";
 
 interface ConfirmModalProps extends ModalProps {
   onConfirm: () => void;
@@ -38,7 +38,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   customButton,
   customButtonPlacement = "start",
   isLoading = false,
-  iconName = "delete",
+  iconName = "archive",
   message,
   header,
   iconclassName,
@@ -97,12 +97,12 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
               iconBackgroundClassName
             )}
           >
-            {/* {iconName && (
+            {iconName && (
               <Icon
                 name={iconName}
                 className={`icon-wrapper ${iconclassName}`}
               />
-            )}{" "} */}
+            )}
           </div>
           <h2 className="text-xl font-semibold">{header}</h2>
           {message && <p className="text-base text-Primary-900">{message}</p>}

@@ -11,8 +11,8 @@ import { ColumnDef, Row } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 
 export interface RestaurantManagementType {
-  id: string;
-  name: string;
+  value: string;
+  label: string;
 }
 const useRestaurantManagement = () => {
   const [openAddEditRestaurantModal, setOpenAddEditRestaurantModal] =
@@ -56,7 +56,7 @@ const useRestaurantManagement = () => {
         accessorKey: "name",
         header: "Name",
         cell: ({ row }: { row: Row<RestaurantManagementType> }) => {
-          return row?.original?.name;
+          return row?.original?.label;
         },
         enableSorting: false,
       },

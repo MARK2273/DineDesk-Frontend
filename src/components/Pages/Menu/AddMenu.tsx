@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { dispatchToast } from "@dine-desk/helper/toastHelper";
 import { extractErrors } from "@dine-desk/helper";
 import SectionLoader from "@dine-desk/Common/Components/Loader/Spinner";
+import { storageHelper } from "@dine-desk/helper/storageHelper";
 
 interface AddEditMenuModalProps {
   open: boolean;
@@ -42,11 +43,24 @@ const AddEditMenu: React.FC<AddEditMenuModalProps> = ({
 
   const onSubmit = async (data: MenuData) => {
     try {
+      const storage = storageHelper("session");
+      const restaurantId = storage.getItem("restaurantId");
+      console.log({ restaurantId });
+      if (!restaurantId) {
+        dispatchToast("error", "Please select a restaurant");
+        return;
+      }
+
+      const finalData = {
+        restaurantId,
+        name: data?.name,
+      };
+
       if (isEdit) {
-        await updateMenu(data);
+        await updateMenu(finalData);
         dispatchToast("success", "Menu updated successfully");
       } else {
-        await createMenu(data);
+        await createMenu(finalData);
         dispatchToast("success", "Menu created successfully");
       }
       reset();

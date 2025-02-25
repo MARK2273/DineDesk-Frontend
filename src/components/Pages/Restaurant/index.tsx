@@ -55,7 +55,7 @@ const Restaurant = () => {
           }}
           open={openAddEditRestaurantModal}
           isEdit={!!selectedRestaurant}
-          id={selectedRestaurant?.id}
+          id={selectedRestaurant?.value}
         />
       )}
 
@@ -64,8 +64,8 @@ const Restaurant = () => {
         isLoading={isRestaurantArchivePending}
         open={openRestaurantArchiveModal}
         onConfirm={() => {
-          if (selectedRestaurant?.id !== undefined) {
-            handleConfirmArchiveModal(+selectedRestaurant?.id);
+          if (selectedRestaurant?.value !== undefined) {
+            handleConfirmArchiveModal(+selectedRestaurant?.value);
           }
         }}
         showCancel
