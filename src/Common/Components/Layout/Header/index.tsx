@@ -4,8 +4,8 @@ import { useGetRestaurantList } from "@dine-desk/api/restaurant";
 import SectionLoader from "../../Loader/Spinner";
 import { MultiValue, SingleValue } from "react-select";
 import { storageHelper } from "@dine-desk/helper/storageHelper";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@dine-desk/redux/store";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@dine-desk/redux/store";
 import {
   removeRestaurant,
   setRestaurant,
@@ -16,10 +16,6 @@ const Header = () => {
   const storage = storageHelper("session");
 
   const { data, isLoading, dataUpdatedAt } = useGetRestaurantList();
-
-  const selectedRestaurant = useSelector(
-    (state: RootState) => state.restaurant.restaurant
-  );
 
   const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
 
