@@ -45,22 +45,16 @@ const AddEditMenu: React.FC<AddEditMenuModalProps> = ({
     try {
       const storage = storageHelper("session");
       const restaurantId = storage.getItem("restaurantId");
-      console.log({ restaurantId });
-      if (!restaurantId) {
-        dispatchToast("error", "Please select a restaurant");
-        return;
-      }
-
-      const finalData = {
-        restaurantId,
-        name: data?.name,
-      };
 
       if (isEdit) {
-        await updateMenu(finalData);
+        await updateMenu(data);
         dispatchToast("success", "Menu updated successfully");
       } else {
-        await createMenu(finalData);
+        if (!restaurantId) {
+          dispatchToast("error", "Please select a restaurant");
+          return;
+        }
+        await createMenu({ ...data, restaurantId });
         dispatchToast("success", "Menu created successfully");
       }
       reset();
