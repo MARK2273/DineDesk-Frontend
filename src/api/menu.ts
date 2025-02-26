@@ -47,7 +47,7 @@ export const useUpdateMenu = (id: string | number | undefined) => {
   const { invalidate } = useInvalidateQuery();
   return useMutation({
     mutationKey: ["updateMenu", id],
-    mutationFn: async (data: MenuData & { restaurantId: string }) => {
+    mutationFn: async (data: MenuData) => {
       const res = await axiosPut(`/menu/${id}`, {
         data: data,
         headers: {

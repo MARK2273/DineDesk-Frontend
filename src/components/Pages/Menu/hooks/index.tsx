@@ -5,8 +5,10 @@ import Tooltip from "@dine-desk/Common/Components/ToolTip";
 import { ROUTES } from "@dine-desk/constants/RoutePath";
 import { extractErrors } from "@dine-desk/helper";
 import { dispatchToast } from "@dine-desk/helper/toastHelper";
+import { RootState } from "@dine-desk/redux/store";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 export interface MenuManagementType {
@@ -22,9 +24,16 @@ const useMenuManagement = () => {
   ] = useState(false);
   const [openQRModal, setOpenQRModal] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState<any>(null);
+
+  const selectedRestaurant = useSelector(
+    (state: RootState) => state.restaurant?.selectedRestaurant
+  );
+
+  const restaurantId = selectedRestaurant?.id;
+
   const { apiData } = useTableManagement<MenuManagementType, object>({
     apiCall: useGetMenuList,
-    initialQueryParams: {},
+    initialQueryParams: { restaurantId },
   });
   const { mutateAsync: archiveMenu, isPending: isMenuArchivePending } =
     useArchiveMenu();
