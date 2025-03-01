@@ -1,18 +1,17 @@
 import { useMutation, useQuery } from ".";
 import { axiosDelete, axiosGet, axiosPost, axiosPut } from "./axios";
 import { useInvalidateQuery } from "./data-fetching";
-import { RestaurantData } from "@dine-desk/schema/restaurant";
 import { restaurantQueryKeyMap } from "./common/restaurantQueryKey";
 
 export const useCreateRestaurant = () => {
   const { invalidate } = useInvalidateQuery();
   return useMutation({
     mutationKey: ["addRestaurant"],
-    mutationFn: async (data: RestaurantData) => {
+    mutationFn: async (data: FormData) => {
       const res = await axiosPost("/restaurant", {
-        data: data,
+        data,
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
           Accept: "application/json",
         },
       });
@@ -47,11 +46,11 @@ export const useUpdateRestaurant = (id: string | number | undefined) => {
   const { invalidate } = useInvalidateQuery();
   return useMutation({
     mutationKey: ["updateRestaurant", id],
-    mutationFn: async (data: RestaurantData) => {
+    mutationFn: async (data: FormData) => {
       const res = await axiosPut(`/restaurant/${id}`, {
-        data: data,
+        data,
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
           Accept: "application/json",
         },
       });
