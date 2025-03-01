@@ -4,6 +4,7 @@ import {
   useUpdateRestaurant,
 } from "@dine-desk/api/restaurant";
 import Button from "@dine-desk/Common/Components/Button";
+import FileUpload from "@dine-desk/Common/Components/FormField/FileUpload";
 import InputField from "@dine-desk/Common/Components/FormField/InputField";
 import SectionLoader from "@dine-desk/Common/Components/Loader/Spinner";
 import Modal from "@dine-desk/Common/Components/Modal";
@@ -32,11 +33,15 @@ const AddEditRestaurant: React.FC<AddEditRestaurantModalProps> = ({
     register,
     handleSubmit,
     formState: { errors },
+    watch,
     reset,
+    setValue,
   } = useForm<RestaurantData>({
     resolver: yupResolver(restaurantSchema),
     defaultValues: initialValues,
   });
+  const image = watch("image");
+
   useEffect(() => reset(initialValues), [dataUpdatedAt]);
 
   const {
@@ -48,15 +53,44 @@ const AddEditRestaurant: React.FC<AddEditRestaurantModalProps> = ({
     isPending: isCreateRestaurantPending,
   } = useCreateRestaurant();
 
+  // const onSubmit = async (data: RestaurantData) => {
+  //   try {
+  //     if (isEdit) {
+  //       await updateRestaurant(data);
+  //       dispatchToast("success", "Restaurant updated successfully");
+  //     } else {
+  //       await createRestaurant(data);
+  //       dispatchToast("success", "Restaurant created successfully");
+  //     }
+  //     reset();
+  //     onClose();
+  //   } catch (error: any) {
+  //     const errors = extractErrors(error);
+  //     dispatchToast("error", errors || "Something went wrong");
+  //   }
+  // };
+
   const onSubmit = async (data: RestaurantData) => {
     try {
+      const formData = new FormData();
+      formData.append("name", data.name);
+
+      if (data.image && data.image.length > 0) {
+        data.image.forEach((file) => {
+          if (file instanceof File) {
+            formData.append("image", file);
+          }
+        });
+      }
+
       if (isEdit) {
-        await updateRestaurant(data);
+        await updateRestaurant(formData);
         dispatchToast("success", "Restaurant updated successfully");
       } else {
-        await createRestaurant(data);
+        await createRestaurant(formData);
         dispatchToast("success", "Restaurant created successfully");
       }
+
       reset();
       onClose();
     } catch (error: any) {
@@ -103,6 +137,11 @@ const AddEditRestaurant: React.FC<AddEditRestaurantModalProps> = ({
             error={errors?.name?.message}
             register={register}
             inputClass="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          />
+          <FileUpload
+            value={image}
+            onChange={(files) => setValue("image", files)}
+            onError={(error) => console.error(error)}
           />
         </div>
       </div>

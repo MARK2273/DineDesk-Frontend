@@ -10,6 +10,11 @@ export const restaurantSchema = yup.object().shape({
     minMessage: "Minimum 3 characters",
     trim: true,
   }),
+  image: validationRules.array({
+    fieldName: "image",
+    required: true,
+    requiredMessage: "Restaurant image is required",
+  }),
 });
 
 export type RestaurantData = yup.InferType<typeof restaurantSchema>;

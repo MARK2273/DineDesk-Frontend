@@ -25,6 +25,9 @@ import Archive from "../../../assets/svg/Archive.svg?react";
 import PasswordVisible from "../../../assets/svg/PasswordVisible.svg?react";
 import PasswordEye from "../../../assets/svg/PasswordEye.svg?react";
 import Logout from "../../../assets/svg/Logout.svg?react";
+import Pdf from "../../../assets/svg/Pdf.svg?react";
+import ChooseImage from "../../../assets/svg/ChooseImage.svg?react";
+import Files from "../../../assets/svg/Files.svg?react";
 import Image from "../Image";
 import SectionLoader from "../Loader/Spinner";
 
@@ -51,6 +54,9 @@ export type IconNameType =
   | "archive"
   | "passwordVisible"
   | "passwordEye"
+  | "pdf"
+  | "chooseImage"
+  | "files"
   | "logout";
 
 type IconProps = {
@@ -133,6 +139,12 @@ const Icon = ({
         return <Logout {...iconProps} />;
       case "restaurant":
         return <Restaurant {...iconProps} />;
+      case "pdf":
+        return <Pdf {...iconProps} />;
+      case "chooseImage":
+        return <ChooseImage {...iconProps} />;
+      case "files":
+        return <Files {...iconProps} />;
       default:
         return <></>;
     }
