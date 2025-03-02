@@ -29,6 +29,7 @@ import { dispatchToast } from "@dine-desk/helper/toastHelper";
 import { extractErrors } from "@dine-desk/helper";
 import SectionLoader from "@dine-desk/Common/Components/Loader/Spinner";
 import { storageHelper } from "@dine-desk/helper/storageHelper";
+import FileUpload from "@dine-desk/Common/Components/FormField/FileUpload";
 
 type MenuItemType = {
   available?: boolean | undefined;
@@ -36,6 +37,7 @@ type MenuItemType = {
   price: string;
   category: string;
   description: string;
+  image: any[];
   menuId?: string;
   id?: string;
 };
@@ -62,20 +64,6 @@ type DraggableRowProps = {
   errors: FieldErrors<{
     items?: MenuItemType[] | undefined;
   }>;
-};
-
-const transformMenuData = (
-  data: { items?: MenuItemType[] },
-  menuId?: string,
-  restaurantId?: string
-) => {
-  if (data.items && data.items.length > 0)
-    return data.items.map((item) => ({
-      ...item,
-      menuId,
-      restaurantId,
-      available: item.available || false,
-    }));
 };
 
 const AddEditItem = () => {
@@ -105,7 +93,7 @@ const AddEditItem = () => {
       reset({
         items: data.map((item: MenuItemType) => ({
           ...item,
-          price: item.price.toString(),
+          price: item.price?.toString(),
         })),
       });
     }
@@ -114,20 +102,48 @@ const AddEditItem = () => {
 
   const onSubmit = async (data: ItamData) => {
     try {
+      const formData = new FormData();
+
       const storage = storageHelper("session");
       const restaurantId = storage.getItem("restaurantId");
+
       if (!restaurantId) {
         dispatchToast("error", "Please select a restaurant");
         return;
       }
-      const finalData = transformMenuData(data, menuId, restaurantId);
+
+      formData.append("restaurantId", restaurantId);
+
+      data.items?.forEach((item, index) => {
+        formData.append(`items[${index}][name]`, item.name);
+        formData.append(`items[${index}][price]`, item.price.toString());
+        formData.append(`items[${index}][category]`, item.category);
+        formData.append(`items[${index}][description]`, item.description || "");
+        formData.append(
+          `items[${index}][available]`,
+          item.available ? "true" : "false"
+        );
+        formData.append(`items[${index}][menuId]`, menuId || "");
+
+        if (item.image && item.image.length > 0) {
+          item.image.forEach((fileOrUrl) => {
+            if (typeof fileOrUrl === "string") {
+              formData.append(`items[${index}][image]`, fileOrUrl);
+            } else if (fileOrUrl instanceof File) {
+              formData.append(`items[${index}][image]`, fileOrUrl);
+            }
+          });
+        }
+      });
+
       if (isEdit) {
-        await updateItems(finalData);
+        await updateItems(formData);
         dispatchToast("success", "Menu updated successfully");
       } else {
-        await createItems(finalData);
+        await createItems(formData);
         dispatchToast("success", "Menu created successfully");
       }
+
       navigate(ROUTES.MENU.path);
     } catch (error: any) {
       const errors = extractErrors(error);
@@ -150,7 +166,7 @@ const AddEditItem = () => {
   }
 
   return (
-    <div className="bg-white shadow-lg rounded-xl p-6 max-w-4xl mx-auto">
+    <div className="bg-white shadow-lg rounded-xl p-6 max-w-full mx-auto w-full">
       <div className="flex flex-col sm:flex-row items-center justify-between border-b pb-4">
         <h4 className="text-xl font-semibold">Add Items</h4>
         <Button
@@ -162,6 +178,7 @@ const AddEditItem = () => {
               category: "",
               description: "",
               available: false,
+              image: [],
             })
           }
           title="Add Item"
@@ -222,6 +239,8 @@ const DraggableRow = ({
     useSortable({ id: field.id });
   const style = { transform: CSS.Transform.toString(transform), transition };
 
+  const image = watch(`items.${index}.image`);
+
   return (
     <div
       ref={setNodeRef}
@@ -233,7 +252,6 @@ const DraggableRow = ({
         {...listeners}
         className="text-lg font-bold cursor-grab"
         style={{ touchAction: "none" }}
-        // onPointerDown={(e) => e.preventDefault()} // Prevent scrolling
       >
         ☰
       </span>
@@ -248,7 +266,15 @@ const DraggableRow = ({
         }
         className="mt-1"
       />
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 w-full">
+        <FileUpload
+          allowedFileTypes={["image/jpeg", "image/png"]}
+          value={image}
+          onChange={(files) =>
+            setValue(`items.${index}.image`, files, { shouldValidate: true })
+          }
+          error={errors?.items?.[index]?.image?.message}
+        />
         <InputField
           label="Name"
           name={`items.${index}.name`}

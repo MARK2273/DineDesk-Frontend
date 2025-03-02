@@ -53,23 +53,6 @@ const AddEditRestaurant: React.FC<AddEditRestaurantModalProps> = ({
     isPending: isCreateRestaurantPending,
   } = useCreateRestaurant();
 
-  // const onSubmit = async (data: RestaurantData) => {
-  //   try {
-  //     if (isEdit) {
-  //       await updateRestaurant(data);
-  //       dispatchToast("success", "Restaurant updated successfully");
-  //     } else {
-  //       await createRestaurant(data);
-  //       dispatchToast("success", "Restaurant created successfully");
-  //     }
-  //     reset();
-  //     onClose();
-  //   } catch (error: any) {
-  //     const errors = extractErrors(error);
-  //     dispatchToast("error", errors || "Something went wrong");
-  //   }
-  // };
-
   const onSubmit = async (data: RestaurantData) => {
     try {
       const formData = new FormData();
@@ -141,7 +124,7 @@ const AddEditRestaurant: React.FC<AddEditRestaurantModalProps> = ({
           <FileUpload
             value={image}
             onChange={(files) => setValue("image", files)}
-            onError={(error) => console.error(error)}
+            error={errors?.image?.message}
           />
         </div>
       </div>
