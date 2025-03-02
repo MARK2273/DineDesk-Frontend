@@ -59,9 +59,12 @@ const AddEditRestaurant: React.FC<AddEditRestaurantModalProps> = ({
       formData.append("name", data.name);
 
       if (data.image && data.image.length > 0) {
-        data.image.forEach((file) => {
-          if (file instanceof File) {
-            formData.append("image", file);
+        data.image.forEach((fileOrUrl) => {
+          console.log(fileOrUrl, "fileOrUrl");
+          if (typeof fileOrUrl === "string") {
+            formData.append("image", fileOrUrl);
+          } else if (fileOrUrl instanceof File) {
+            formData.append("image", fileOrUrl);
           }
         });
       }
