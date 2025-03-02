@@ -3,28 +3,15 @@ import { axiosGet, axiosPost, axiosPut } from "./axios";
 import { useMutation, useQuery } from ".";
 import { itemQueryKeyMap } from "./common/itemQueryKey";
 
-type AddUpdateItem =
-  | {
-      menuId?: string;
-      id?: string;
-      name: string;
-      price: string;
-      category: string;
-      description: string;
-      available?: boolean;
-      restaurantId?: string;
-    }[]
-  | undefined;
-
 export const useCreateItem = () => {
   const { invalidate } = useInvalidateQuery();
   return useMutation({
     mutationKey: ["addItem"],
-    mutationFn: async (data: AddUpdateItem) => {
+    mutationFn: async (data: FormData) => {
       const res = await axiosPost("/item", {
         data: data,
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
           Accept: "application/json",
         },
       });
@@ -40,11 +27,11 @@ export const useUpdateItems = () => {
   const { invalidate } = useInvalidateQuery();
   return useMutation({
     mutationKey: ["updateItems"],
-    mutationFn: async (data: AddUpdateItem) => {
+    mutationFn: async (data: FormData) => {
       const res = await axiosPut(`/item`, {
         data: data,
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
           Accept: "application/json",
         },
       });

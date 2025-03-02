@@ -11,6 +11,7 @@ interface FileUploadProps {
   onChange?: (files: (File | string)[]) => void;
   onError?: (error: string) => void;
   showPreview?: boolean;
+  error?: string;
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({
@@ -22,6 +23,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   onChange,
   onError,
   showPreview = true,
+  error,
 }) => {
   const [files, setFiles] = useState<(File | string)[]>(value || []);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -63,16 +65,23 @@ const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      {label && <label className="font-semibold text-gray-700">{label}</label>}
+    <div className="flex flex-col w-full max-w-lg mx-auto">
+      {label && (
+        <label className="font-semibold text-gray-700 text-sm sm:text-base">
+          {label}
+        </label>
+      )}
+
+      {/* Upload Box */}
       {files.length === 0 && (
         <div
           onClick={() => inputRef.current?.click()}
-          className="flex items-center justify-center px-6 py-4 border-2 border-dashed border-blue-500 rounded-lg cursor-pointer transition-all hover:bg-blue-50"
+          className="flex items-center justify-center px-4 py-3 sm:px-6 sm:py-4 border-2 border-dashed border-blue-500 rounded-lg cursor-pointer transition-all hover:bg-blue-50 text-center text-sm sm:text-base"
         >
           <span className="text-blue-500 font-medium">Click to upload</span>
         </div>
       )}
+
       <input
         type="file"
         multiple={isMulti}
@@ -81,8 +90,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
         onChange={handleFileChange}
         className="hidden"
       />
+
+      {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}
+
+      {/* File Previews */}
       {showPreview && files.length > 0 && (
-        <div className="flex flex-wrap gap-3 mt-2">
+        <div className="">
           {files.map((file, index) => (
             <Preview
               key={index}
@@ -92,10 +105,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
           ))}
         </div>
       )}
+
+      {/* Clear All Button */}
       {isMulti && files.length > 0 && (
         <Button
           type="button"
-          className=" text-sm font-medium text-red-500"
+          className="text-sm sm:text-base font-medium text-red-500"
           onClick={() => setFiles([])}
           title="Clear All"
           variant="none"

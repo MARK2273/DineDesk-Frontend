@@ -14,7 +14,7 @@ const Preview: React.FC<PreviewProps> = ({
   file,
   onCancel,
   basePath,
-  className = "bg-gray-100 p-4 rounded-lg shadow",
+  className = "bg-gray-100 p-2 rounded-lg shadow flex items-center justify-between w-full",
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -37,7 +37,7 @@ const Preview: React.FC<PreviewProps> = ({
         <img
           src={fileUrl}
           alt="Preview"
-          className="max-w-full max-h-[80vh] object-contain rounded-lg"
+          className="max-w-full max-h-[80vh] md:max-h-[90vh] object-contain rounded-lg"
         />
       );
     }
@@ -45,7 +45,7 @@ const Preview: React.FC<PreviewProps> = ({
       return (
         <iframe
           src={fileUrl}
-          className="w-full h-[80vh] rounded-lg"
+          className="w-full h-[80vh] md:h-[90vh] rounded-lg"
           title="PDF Preview"
         />
       );
@@ -69,7 +69,7 @@ const Preview: React.FC<PreviewProps> = ({
           }
           className="text-Primary-500"
         />
-        <span className="text-sm text-gray-700 truncate max-w-xs font-semibold">
+        <span className="text-sm text-gray-700 truncate max-w-xs sm:max-w-sm md:max-w-md font-semibold">
           {isLocalFile ? (file as File).name : file.split("/").pop()}
         </span>
         {onCancel && (
