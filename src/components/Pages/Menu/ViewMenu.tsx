@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Image from "@dine-desk/Common/Components/Image"; // Adjust the import path as necessary
 import { useGetItemList } from "@dine-desk/api/item";
 import { useParams } from "react-router-dom";
 import { Skeleton } from "@dine-desk/Common/Components/Skeleton";
@@ -43,6 +44,13 @@ const ViewMenu = () => {
                     className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ease-in-out p-5 border border-gray-200"
                   >
                     <div className="flex flex-col justify-between h-full space-y-3">
+                      <Image
+                        imgPath={item?.image?.[0]} // Assuming `imageUrl` is the field containing the image path
+                        alt={item.name}
+                        className="w-full h-40 object-cover rounded-lg mb-3"
+                        imageClassName="w-full h-40 object-cover rounded-lg"
+                      />
+
                       <div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">
                           {item.name}
