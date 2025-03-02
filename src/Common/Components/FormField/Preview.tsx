@@ -28,17 +28,44 @@ const Preview: React.FC<PreviewProps> = ({
     ? `${basePath}/${file}`
     : file;
 
+  // const renderFilePreview = () => {
+  //   if (
+  //     fileType?.startsWith("image") ||
+  //     ["png", "jpg", "jpeg", "gif"].includes(fileType || "")
+  //   ) {
+  //     return (
+  //       <img
+  //         src={fileUrl}
+  //         alt="Preview"
+  //         className="max-w-full max-h-[80vh] md:max-h-[90vh] object-contain rounded-lg"
+  //       />
+  //     );
+  //   }
+  //   if (fileType === "pdf") {
+  //     return (
+  //       <iframe
+  //         src={fileUrl}
+  //         className="w-full h-[80vh] md:h-[90vh] rounded-lg"
+  //         title="PDF Preview"
+  //       />
+  //     );
+  //   }
+  //   return <p className="text-gray-700 text-center">Unsupported file type</p>;
+  // };
+
   const renderFilePreview = () => {
     if (
       fileType?.startsWith("image") ||
       ["png", "jpg", "jpeg", "gif"].includes(fileType || "")
     ) {
       return (
-        <img
-          src={fileUrl}
-          alt="Preview"
-          className="max-w-full max-h-[80vh] md:max-h-[90vh] object-contain rounded-lg"
-        />
+        <div className="flex items-center justify-center w-full h-full">
+          <img
+            src={fileUrl}
+            alt="Preview"
+            className="max-w-full max-h-full object-contain rounded-lg"
+          />
+        </div>
       );
     }
     if (fileType === "pdf") {
