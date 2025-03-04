@@ -26,6 +26,7 @@ axios.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       const storage = storageHelper("session");
       storage.removeItem("token"); // Remove invalid token
+      console.log("hello");
       window.location.href = "/login"; // Redirect user to login page
     }
     return Promise.reject(error);
