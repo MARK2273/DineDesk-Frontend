@@ -7,12 +7,14 @@ import clsx from "clsx";
 
 const ViewMenu = () => {
   const { menuId } = useParams<{ menuId: string }>();
-  const { data, isLoading } = useGetItemList(menuId);
+  const { data, isLoading, dataUpdatedAt } = useGetItemList(menuId);
   const [groupedMenu, setGroupedMenu] = useState<Record<string, any[]>>({});
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [cart, setCart] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     if (data) {
+      console.log(data);
       const grouped = data.reduce((acc: any, item: any) => {
         acc[item.category] = acc[item.category] || [];
         acc[item.category].push(item);
@@ -20,9 +22,25 @@ const ViewMenu = () => {
       }, {});
       setGroupedMenu(grouped);
     }
-  }, [data]);
+  }, [dataUpdatedAt]);
 
   const categories = ["All", ...Object.keys(groupedMenu)];
+
+  const handleAdd = (itemId: string) => {
+    setCart((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
+  };
+
+  const handleRemove = (itemId: string) => {
+    setCart((prev) => {
+      const newCart = { ...prev };
+      if (newCart[itemId] > 1) {
+        newCart[itemId] -= 1;
+      } else {
+        delete newCart[itemId];
+      }
+      return newCart;
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-10 font-sans">
@@ -51,7 +69,6 @@ const ViewMenu = () => {
         </div>
       </div>
 
-      {/* Menu Items */}
       <div className="mt-32 space-y-10 px-4">
         {isLoading ? (
           <div className="space-y-6">
@@ -65,7 +82,13 @@ const ViewMenu = () => {
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                 {groupedMenu[category].map((item) => (
-                  <MenuItem key={item.id} item={item} />
+                  <MenuItem
+                    key={item.id}
+                    item={item}
+                    cart={cart}
+                    onAdd={handleAdd}
+                    onRemove={handleRemove}
+                  />
                 ))}
               </div>
             </div>
@@ -77,7 +100,13 @@ const ViewMenu = () => {
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {groupedMenu[selectedCategory]?.map((item) => (
-                <MenuItem key={item.id} item={item} />
+                <MenuItem
+                  key={item.id}
+                  item={item}
+                  cart={cart}
+                  onAdd={handleAdd}
+                  onRemove={handleRemove}
+                />
               ))}
             </div>
           </div>
@@ -87,9 +116,23 @@ const ViewMenu = () => {
   );
 };
 
-// Menu Item Component
-const MenuItem = ({ item }: { item: any }) => (
-  <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ease-in-out p-4 border border-gray-200">
+const MenuItem = ({
+  item,
+  cart,
+  onAdd,
+  onRemove,
+}: {
+  item: any;
+  cart: { [key: string]: number };
+  onAdd: (id: string) => void;
+  onRemove: (id: string) => void;
+}) => (
+  <div
+    className={clsx(
+      "bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ease-in-out p-4 border border-gray-200",
+      !item.available && "grayscale"
+    )}
+  >
     <div className="flex flex-col justify-between h-full space-y-3">
       <Image
         imgPath={item?.image?.[0]}
@@ -117,6 +160,35 @@ const MenuItem = ({ item }: { item: any }) => (
           <span className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium bg-red-100 text-red-700 text-center">
             Out of Stock
           </span>
+        )}
+      </div>
+
+      {/* Add/Remove Buttons */}
+      <div className="flex items-center justify-between mt-3">
+        {cart[item.id] ? (
+          <div className="flex items-center w-full justify-between bg-gray-100 rounded-lg p-2">
+            <button
+              onClick={() => onRemove(item.id)}
+              className="text-lg font-bold text-gray-700 px-3 py-1 bg-gray-200 rounded-lg"
+            >
+              -
+            </button>
+            <span className="text-lg font-semibold">{cart[item.id]}</span>
+            <button
+              onClick={() => onAdd(item.id)}
+              className="text-lg font-bold text-white px-3 py-1 bg-gray-900 rounded-lg"
+            >
+              +
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => onAdd(item.id)}
+            className="w-full py-2 text-sm font-semibold text-white bg-gray-900 rounded-lg"
+            disabled={!item.available}
+          >
+            {item.available ? "Add to Cart" : "Unavailable"}
+          </button>
         )}
       </div>
     </div>
