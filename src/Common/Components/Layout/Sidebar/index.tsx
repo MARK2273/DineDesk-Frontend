@@ -4,6 +4,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "../../../../constants/RoutePath";
 import Tooltip from "../../ToolTip";
 import Icon, { IconNameType } from "../../Icon";
+import { storageHelper } from "@dine-desk/helper/storageHelper";
 
 interface SidebarProps {
   toggleSidebar: () => void;
@@ -11,10 +12,11 @@ interface SidebarProps {
 }
 
 const menuItems: { icon: IconNameType; label: string; path: string }[] = [
-  { icon: "home", label: "Dashboard", path: ROUTES.DASHBOARD.path },
-  { icon: "home", label: "Menu", path: ROUTES.MENU.path },
-  { icon: "home", label: "Orders", path: ROUTES.ORDER.path },
-  { icon: "home", label: "Repors", path: ROUTES.REPORT.path },
+  { icon: "dashboard", label: "Dashboard", path: ROUTES.DASHBOARD.path },
+  { icon: "restaurant", label: "Restaurant", path: ROUTES.RESTAURANT.path },
+  { icon: "menu", label: "Menu", path: ROUTES.MENU.path },
+  { icon: "order", label: "Orders", path: ROUTES.ORDER.path },
+  { icon: "report", label: "Repors", path: ROUTES.REPORT.path },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -23,6 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const storage = storageHelper("session");
   const activeItem: string =
     menuItems.find((el) => location.pathname.includes(el.path))?.label ||
     menuItems[0].label;
@@ -30,11 +33,15 @@ const Sidebar: React.FC<SidebarProps> = ({
   const handleLogoClick = () => {
     navigate(ROUTES.DEFAULT.path);
   };
+  const handleLogout = () => {
+    storage.removeItem("token"); // Clear token from session storage
+    navigate(ROUTES.LOGIN.path); // Redirect to login page
+  };
 
   return (
     <div
       className={clsx(
-        "fixed z-20 bg-white h-full transition-all duration-300 ease-in-out",
+        "fixed z-20 bg-gray-100 h-full transition-all duration-300 ease-in-out",
         isSidebarOpen ? "w-64" : "w-16"
       )}
     >
@@ -58,7 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               isSidebarOpen ? "rotate-180" : "rotate-0"
             )}
           >
-            <Icon name="leftarrow" />
+            <Icon name="leftArrow" />
           </div>
         </div>
       </div>
@@ -99,6 +106,39 @@ const Sidebar: React.FC<SidebarProps> = ({
           </Tooltip>
         ))}
       </ul>
+      <div className="absolute bottom-4 left-0 w-full">
+        <Tooltip
+          content="Logout"
+          placement="right"
+          className={clsx(isSidebarOpen ? "hidden" : "block")}
+        >
+          {/* <div className="absolute bottom-4 left-0 w-full"> */}
+          <button
+            onClick={handleLogout}
+            className={clsx(
+              "relative flex items-center gap-2 w-full px-3 py-2 cursor-pointer transition-all",
+              "after:transition-all after:duration-300 after:ease-in-out after:absolute after:right-0 after:h-full after:bg-transparent after:rounded-l-full",
+              "hover:text-red-600",
+              isSidebarOpen ? "after:w-2.5" : "after:w-[5px]",
+              "text-gray-600"
+            )}
+          >
+            <Icon
+              name="logout"
+              className="w-6 transition-all duration-300 ease-in-out"
+            />
+            <span
+              className={clsx(
+                "text-lg font-medium leading-6 truncate transition-all duration-300 ease-in-out",
+                isSidebarOpen ? "w-[calc(100%-32px)]" : "w-0"
+              )}
+            >
+              Logout
+            </span>
+          </button>
+          {/* </div> */}
+        </Tooltip>
+      </div>
     </div>
   );
 };

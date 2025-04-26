@@ -1,0 +1,81 @@
+import { useEffect, useState } from "react";
+import CustomSelect, { OptionType } from "../../FormField/CustomSelect";
+import { useGetRestaurantList } from "@dine-desk/api/restaurant";
+import SectionLoader from "../../Loader/Spinner";
+import { MultiValue, SingleValue } from "react-select";
+import { storageHelper } from "@dine-desk/helper/storageHelper";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@dine-desk/redux/store";
+import {
+  removeRestaurant,
+  setRestaurant,
+} from "@dine-desk/redux/ducks/restaurantSlice";
+
+const Header = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const storage = storageHelper("session");
+
+  const { data, isLoading, dataUpdatedAt } = useGetRestaurantList();
+
+  const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
+
+  const handleSelectChange = (
+    newValue: MultiValue<OptionType> | SingleValue<OptionType>
+  ) => {
+    if (newValue === null) {
+      storage.removeItem("restaurantId");
+      dispatch(removeRestaurant());
+      setSelectedOption(null);
+      return;
+    }
+
+    const selected = newValue as OptionType;
+    storage.setItem("restaurantId", selected.value);
+    dispatch(setRestaurant({ id: +selected.value, name: selected.label }));
+    setSelectedOption(selected);
+  };
+
+  useEffect(() => {
+    const storedRestaurantId = storage.getItem("restaurantId");
+
+    if (storedRestaurantId && data) {
+      const existingRestaurant = data.find(
+        (option: OptionType) => option.value === +storedRestaurantId
+      );
+
+      if (existingRestaurant) {
+        dispatch(
+          setRestaurant({
+            id: +existingRestaurant.value,
+            name: existingRestaurant.label,
+          })
+        );
+        setSelectedOption(existingRestaurant);
+      } else {
+        dispatch(removeRestaurant());
+        setSelectedOption(null);
+        storage.removeItem("restaurantId");
+      }
+    }
+  }, [dataUpdatedAt, dispatch]);
+
+  if (isLoading) {
+    return <SectionLoader />;
+  }
+
+  return (
+    <header className="bg-white shadow-md flex items-center justify-between px-6 py-4">
+      <h1 className="text-lg font-semibold">Dine Desk Dashboard</h1>
+      <CustomSelect
+        options={data}
+        value={selectedOption}
+        onChange={handleSelectChange}
+        placeholder="Choose Restaurant"
+        isClearable={true}
+        isDisabled={false}
+      />
+    </header>
+  );
+};
+
+export default Header;
