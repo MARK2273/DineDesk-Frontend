@@ -4,6 +4,10 @@ import { useGetItemList } from "@dine-desk/api/item";
 import { useParams } from "react-router-dom";
 import { Skeleton } from "@dine-desk/Common/Components/Skeleton";
 import clsx from "clsx";
+import { useCreateOrder } from "@dine-desk/api/order";
+import { storageHelper } from "@dine-desk/helper/storageHelper";
+import { dispatchToast } from "@dine-desk/helper/toastHelper";
+import { extractErrors } from "@dine-desk/helper";
 
 const ViewMenu = () => {
   const { menuId } = useParams<{ menuId: string }>();
@@ -11,6 +15,9 @@ const ViewMenu = () => {
   const [groupedMenu, setGroupedMenu] = useState<Record<string, any[]>>({});
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [cart, setCart] = useState<{ [key: string]: number }>({});
+
+  const { mutateAsync: createOrder, isPending: isCreateOrderPending } =
+    useCreateOrder();
 
   useEffect(() => {
     if (data) {
@@ -42,14 +49,53 @@ const ViewMenu = () => {
     });
   };
 
+  const handleSubmitOrder = async () => {
+    try {
+      if (!data) return;
+      console.log(cart);
+      const storage = storageHelper("session");
+      const restaurantId = storage.getItem("restaurantId");
+
+      if (!restaurantId) {
+        dispatchToast("error", "Please select a restaurant");
+        return;
+      }
+
+      const items = Object.entries(cart).map(([itemId, quantity]) => {
+        return {
+          itemId: Number(itemId),
+          quantity,
+        };
+      });
+
+      const payload = {
+        restaurantId: +restaurantId,
+        items,
+      };
+      console.log(payload);
+
+      await createOrder(payload);
+      dispatchToast("success", "Order Placed successfully");
+      setCart({});
+    } catch (error: any) {
+      const errors = extractErrors(error);
+      dispatchToast("error", errors || "Something went wrong");
+    }
+  };
+
+  const totalAmount = Object.entries(cart).reduce((total, [itemId, qty]) => {
+    const item = data?.find(
+      (item: { id: number; price: number }) => item.id.toString() === itemId
+    );
+    return item ? total + item.price * qty : total;
+  }, 0);
+
   return (
     <div className="min-h-screen bg-gray-50 pb-10 font-sans">
-      {/* Header */}
       <header className="bg-white fixed top-0 left-0 w-full py-5 px-6 flex items-center justify-between z-20">
         <h1 className="text-2xl font-bold text-gray-800">📜 Menu</h1>
       </header>
 
-      {/* Fixed Category Bar */}
       <div className="fixed top-[70px] left-0 w-full bg-white px-4 py-2 z-10 border-b border-gray-200 sm:px-6">
         <div className="flex overflow-x-auto gap-2 sm:gap-3 no-scrollbar px-2 sm:px-4">
           {categories.map((category) => (
@@ -109,6 +155,31 @@ const ViewMenu = () => {
                 />
               ))}
             </div>
+          </div>
+        )}
+        {Object.keys(cart).length > 0 && (
+          <div className="fixed bottom-0 left-0 w-full bg-white border-t px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-0 z-30 shadow-lg">
+            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-6">
+              <p className="font-medium text-gray-700 text-sm sm:text-base">
+                Total Items:{" "}
+                <span className="font-semibold">
+                  {Object.values(cart).reduce((a, b) => a + b, 0)}
+                </span>
+              </p>
+              <p className="font-medium text-gray-700 text-sm sm:text-base">
+                Total Amount:{" "}
+                <span className="font-semibold">
+                  ₹ {totalAmount.toFixed(2)}
+                </span>
+              </p>
+            </div>
+            <button
+              onClick={handleSubmitOrder}
+              className="w-full md:w-auto bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-md font-semibold transition-all duration-200"
+              disabled={isCreateOrderPending}
+            >
+              {isCreateOrderPending ? "Placing..." : "Place Order"}
+            </button>
           </div>
         )}
       </div>
