@@ -21,6 +21,9 @@ const Menu = () => {
     handleConfirmArchiveModal,
     handleToggleModal,
     isMenuArchivePending,
+    currentPage,
+    setCurrentPage,
+    totalRows,
   } = useMenuManagement();
 
   return (
@@ -45,6 +48,17 @@ const Menu = () => {
             data={data}
             columns={columns}
             isLoading={isDataLoading}
+            setCurrentPage={setCurrentPage}
+            currentPage={
+              typeof currentPage === "string"
+                ? parseInt(currentPage, 10)
+                : currentPage
+            }
+            totalRows={
+              typeof totalRows === "string"
+                ? parseInt(totalRows, 10)
+                : totalRows
+            }
           />
         </div>
       </div>

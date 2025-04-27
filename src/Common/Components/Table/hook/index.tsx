@@ -3,11 +3,23 @@ import { UseQueryResult } from "@tanstack/react-query";
 import { Row, SortingState } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 
-interface GeneralTableHookProps<_, QueryParams> {
+interface GeneralTableHookProps<Data, QueryParams> {
   apiCall: (
     queryParams: QueryParams,
     id?: string | number | undefined
-  ) => UseQueryResult<any, Error>;
+  ) => UseQueryResult<
+    {
+      data: Data;
+      total: number | string;
+      currentPage: number | string;
+      [key: string]:
+        | string
+        | number
+        | Data
+        | { [key: string]: string | number };
+    },
+    Error
+  >;
   isDashboard?: boolean;
   initialQueryParams: QueryParams;
   defaultPage?: number;
@@ -46,7 +58,7 @@ export const useTableManagement = <Data, QueryParams>({
     //   search: debouncedQuery,
     //   // ...(transformSorting && sorting && { order: transformSorting(sorting) })
     // },
-    { ...initialQueryParams },
+    { ...initialQueryParams, page: currentPage, limit: pageSize },
     id
   );
 

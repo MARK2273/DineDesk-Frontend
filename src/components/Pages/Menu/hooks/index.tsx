@@ -31,7 +31,10 @@ const useMenuManagement = () => {
 
   const restaurantId = selectedRestaurant?.id;
 
-  const { apiData } = useTableManagement<MenuManagementType, object>({
+  const { apiData, setCurrentPage, currentPage } = useTableManagement<
+    any,
+    object
+  >({
     apiCall: useGetMenuList,
     initialQueryParams: { restaurantId },
   });
@@ -133,7 +136,7 @@ const useMenuManagement = () => {
 
   return {
     columns,
-    data,
+    data: data?.data,
     isDataLoading,
     openAddOrderModal,
     setOpenAddOrderModal,
@@ -146,6 +149,9 @@ const useMenuManagement = () => {
     handleConfirmArchiveModal,
     handleToggleModal,
     isMenuArchivePending,
+    setCurrentPage,
+    currentPage: data?.currentPage || currentPage,
+    totalRows: data?.total,
   };
 };
 

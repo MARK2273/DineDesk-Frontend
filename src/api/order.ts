@@ -1,6 +1,6 @@
 import { OrderFormData } from "@dine-desk/schema/order";
-import { useMutation } from ".";
-import { axiosPost } from "./axios";
+import { useMutation, useQuery } from ".";
+import { axiosGet, axiosPost } from "./axios";
 import { orderQueryKeyMap } from "./common/orderQueryKey";
 import { useInvalidateQuery } from "./data-fetching";
 
@@ -21,5 +21,24 @@ export const useCreateOrder = () => {
     onSuccess: async () => {
       await invalidate(orderQueryKeyMap.orderList());
     },
+  });
+};
+
+export const useGetOrderList = (params?: object) => {
+  return useQuery({
+    queryKey: orderQueryKeyMap.orderList(params),
+    queryFn: () =>
+      axiosGet("/order", {
+        params: {
+          ...params,
+        },
+      }),
+    select: (res) => {
+      if (res.data?.data?.data.length) {
+        return res.data?.data;
+      }
+      return [];
+    },
+    experimental_prefetchInRender: true,
   });
 };
