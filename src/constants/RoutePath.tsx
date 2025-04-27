@@ -11,6 +11,8 @@ import Root from "../components/Pages/Root";
 import AddEditItem from "../components/Pages/Menu/AddEditItem";
 import ViewMenu from "@dine-desk/components/Pages/Menu/ViewMenu";
 import Register from "@dine-desk/components/Pages/Login/Register";
+import EditOrder from "@dine-desk/components/Pages/Order/EditOrder";
+import ViewOrder from "@dine-desk/components/Pages/Order/ViewOrder";
 
 // import NotFound from "@dine-desk/Common/Components/NotFound";
 
@@ -27,6 +29,8 @@ export type RoutesType = {
     | "RESTAURANT"
     | "ADD_EDIT_MENU"
     | "VIEW_MENU"
+    | "EDIT_ORDER"
+    | "VIEW_ORDER"
     | "REPORT"
     | "ORDER"
     | "LOGIN"
@@ -40,7 +44,7 @@ export type RoutesType = {
     errorElement?: RouteObject["errorElement"];
   };
 } & {
-  [key in "ADD_EDIT_MENU" | "VIEW_MENU"]: {
+  [key in "ADD_EDIT_MENU" | "VIEW_MENU" | "EDIT_ORDER" | "VIEW_ORDER"]: {
     navigatePath: (id: number | string) => string;
   };
 };
@@ -89,6 +93,24 @@ export const ROUTES: RoutesType = {
     showFooter: false,
     headerName: "View menu",
     element: <ViewMenu />,
+  },
+  EDIT_ORDER: {
+    path: "/order/:orderId",
+    navigatePath: (orderId) => `/order/${orderId}`,
+    routeType: "authenticate",
+    showHeader: true,
+    showFooter: true,
+    headerName: "Add Edit Order",
+    element: <EditOrder />,
+  },
+  VIEW_ORDER: {
+    path: "/view-order/:orderId",
+    navigatePath: (orderId) => `/view-order/${orderId}`,
+    routeType: "authenticate",
+    showHeader: true,
+    showFooter: true,
+    headerName: "View Order",
+    element: <ViewOrder />,
   },
   REPORT: {
     path: "/report",
