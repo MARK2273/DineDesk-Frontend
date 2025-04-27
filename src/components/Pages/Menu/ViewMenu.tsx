@@ -21,7 +21,6 @@ const ViewMenu = () => {
 
   useEffect(() => {
     if (data) {
-      console.log(data);
       const grouped = data.reduce((acc: any, item: any) => {
         acc[item.category] = acc[item.category] || [];
         acc[item.category].push(item);
@@ -52,7 +51,6 @@ const ViewMenu = () => {
   const handleSubmitOrder = async () => {
     try {
       if (!data) return;
-      console.log(cart);
       const storage = storageHelper("session");
       const restaurantId = storage.getItem("restaurantId");
 
@@ -72,7 +70,6 @@ const ViewMenu = () => {
         restaurantId: +restaurantId,
         items,
       };
-      console.log(payload);
 
       await createOrder(payload);
       dispatchToast("success", "Order Placed successfully");

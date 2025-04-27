@@ -20,7 +20,7 @@ const useRestaurantManagement = () => {
   const [openRestaurantArchiveModal, setOpenRestaurantArchiveModal] =
     useState(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState<any>(null);
-  const { apiData } = useTableManagement<RestaurantManagementType, object>({
+  const { apiData } = useTableManagement<any, object>({
     apiCall: useGetRestaurantList,
     initialQueryParams: {},
   });
