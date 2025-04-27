@@ -42,3 +42,17 @@ export const useGetOrderList = (params?: object) => {
     experimental_prefetchInRender: true,
   });
 };
+
+export const useGetOrderDetails = (id: string | number) => {
+  return useQuery({
+    queryKey: orderQueryKeyMap.order(id),
+    queryFn: () => axiosGet(`/order/${id}`),
+    select: (res) => {
+      if (res.data?.data?.items.length) {
+        return res.data?.data;
+      }
+      return [];
+    },
+    experimental_prefetchInRender: true,
+  });
+};

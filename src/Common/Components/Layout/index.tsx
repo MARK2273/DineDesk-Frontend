@@ -22,18 +22,22 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }, []);
 
   return (
-    <div className="flex bg-Gray-300 h-screen">
+    <div className="flex bg-Gray-300 h-screen overflow-hidden">
       <Sidebar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <div
         className={clsx(
-          "relative h-full transition-all duration-300 ease-in-out",
+          "relative flex flex-col h-full transition-all duration-300 ease-in-out",
           isSidebarOpen
             ? "ml-64 w-[calc(100%-64px)]"
             : "ml-16 w-[calc(100%-16px)]"
         )}
       >
-        <Header />
-        <div className="px-4 md:px-26px py-4 overflow-y-auto">{children}</div>
+        <div className="flex-shrink-0 z-10 bg-white shadow-md">
+          <Header />
+        </div>
+        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4">
+          {children}
+        </div>
       </div>
     </div>
   );
