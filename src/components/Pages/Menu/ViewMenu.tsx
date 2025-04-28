@@ -15,18 +15,20 @@ const ViewMenu = () => {
   const [groupedMenu, setGroupedMenu] = useState<Record<string, any[]>>({});
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [cart, setCart] = useState<{ [key: string]: number }>({});
+  const storage = storageHelper("session");
 
   const { mutateAsync: createOrder, isPending: isCreateOrderPending } =
     useCreateOrder();
 
   useEffect(() => {
-    if (data) {
-      const grouped = data.reduce((acc: any, item: any) => {
+    if (data?.data) {
+      const grouped = data?.data.reduce((acc: any, item: any) => {
         acc[item.category] = acc[item.category] || [];
         acc[item.category].push(item);
         return acc;
       }, {});
       setGroupedMenu(grouped);
+      storage.setItem("restaurantId", data?.restaurantId);
     }
   }, [dataUpdatedAt]);
 
@@ -51,8 +53,7 @@ const ViewMenu = () => {
   const handleSubmitOrder = async () => {
     try {
       if (!data) return;
-      const storage = storageHelper("session");
-      const restaurantId = storage.getItem("restaurantId");
+      const restaurantId = data?.restaurantId;
 
       if (!restaurantId) {
         dispatchToast("error", "Please select a restaurant");
@@ -81,7 +82,7 @@ const ViewMenu = () => {
   };
 
   const totalAmount = Object.entries(cart).reduce((total, [itemId, qty]) => {
-    const item = data?.find(
+    const item = data?.data?.find(
       (item: { id: number; price: number }) => item.id.toString() === itemId
     );
     return item ? total + item.price * qty : total;

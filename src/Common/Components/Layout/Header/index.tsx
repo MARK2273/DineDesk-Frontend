@@ -10,10 +10,16 @@ import {
   removeRestaurant,
   setRestaurant,
 } from "@dine-desk/redux/ducks/restaurantSlice";
+import { matchPath, useLocation } from "react-router-dom";
+import { ROUTES } from "@dine-desk/constants/RoutePath";
 
 const Header = () => {
+  const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
   const storage = storageHelper("session");
+  const routeData = Object.values(ROUTES).find((route) =>
+    matchPath(route.path, location.pathname)
+  );
 
   const { data, isLoading, dataUpdatedAt } = useGetRestaurantList();
 
@@ -65,7 +71,9 @@ const Header = () => {
 
   return (
     <header className="bg-white shadow-md flex items-center justify-between px-6 py-4">
-      <h1 className="text-lg font-semibold">Dine Desk Dashboard</h1>
+      <h1 className="text-lg font-semibold">
+        {routeData?.headerName || "Dashboard"}
+      </h1>
       <CustomSelect
         options={data}
         value={selectedOption}

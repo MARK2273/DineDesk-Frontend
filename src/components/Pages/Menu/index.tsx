@@ -28,9 +28,6 @@ const Menu = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold">Manage Menus</h2>
-
-      {/* Add Menu Button */}
       <div className="my-4">
         <Button
           onClick={() => {
@@ -63,7 +60,6 @@ const Menu = () => {
         </div>
       </div>
 
-      {/* Add/Edit Menu Modal */}
       {openAddOrderModal && (
         <AddMenu
           onClose={() => {
@@ -76,7 +72,6 @@ const Menu = () => {
         />
       )}
 
-      {/* View QR Modal*/}
       {openQRModal && (
         <ViewQR
           onClose={() => {

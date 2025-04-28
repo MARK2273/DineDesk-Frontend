@@ -168,7 +168,6 @@ const AddEditItem = () => {
   return (
     <div className="bg-white shadow-lg rounded-xl p-6 max-w-full mx-auto w-full">
       <div className="flex flex-col sm:flex-row items-center justify-between border-b pb-4">
-        <h4 className="text-xl font-semibold">Add Items</h4>
         <Button
           variant="filled"
           onClick={() =>

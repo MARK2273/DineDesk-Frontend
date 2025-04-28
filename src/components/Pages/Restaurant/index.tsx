@@ -22,9 +22,6 @@ const Restaurant = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold">Manage Restaurants</h2>
-
-      {/* Add Restaurant Button */}
       <div className="my-4">
         <Button
           onClick={() => {
@@ -46,7 +43,6 @@ const Restaurant = () => {
         </div>
       </div>
 
-      {/* Add/Edit Restaurant Modal */}
       {openAddEditRestaurantModal && (
         <AddEditRestaurant
           onClose={() => {
