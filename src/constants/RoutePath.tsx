@@ -61,6 +61,7 @@ export const ROUTES: RoutesType = {
     showHeader: true,
     showFooter: true,
     element: <Dashboard />,
+    headerName: "Dashboard",
   },
   MENU: {
     path: "/menu",
@@ -68,6 +69,7 @@ export const ROUTES: RoutesType = {
     showHeader: true,
     showFooter: true,
     element: <Menu />,
+    headerName: "Menus",
   },
   RESTAURANT: {
     path: "/restaurant",
@@ -75,6 +77,7 @@ export const ROUTES: RoutesType = {
     showHeader: true,
     showFooter: true,
     element: <Restaurant />,
+    headerName: "Restaurants",
   },
   ADD_EDIT_MENU: {
     path: "/menu/:menuId",
@@ -82,8 +85,8 @@ export const ROUTES: RoutesType = {
     routeType: "authenticate",
     showHeader: true,
     showFooter: true,
-    headerName: "Add Edit Menu",
     element: <AddEditItem />,
+    headerName: "Add Edit Menu",
   },
   VIEW_MENU: {
     path: "/view-menu/:menuId",
@@ -91,8 +94,8 @@ export const ROUTES: RoutesType = {
     routeType: "public",
     showHeader: false,
     showFooter: false,
-    headerName: "View menu",
     element: <ViewMenu />,
+    headerName: "View menu",
   },
   EDIT_ORDER: {
     path: "/order/:orderId",
@@ -100,8 +103,8 @@ export const ROUTES: RoutesType = {
     routeType: "authenticate",
     showHeader: true,
     showFooter: true,
-    headerName: "Add Edit Order",
     element: <EditOrder />,
+    headerName: "Add Edit Order",
   },
   VIEW_ORDER: {
     path: "/view-order/:orderId",
@@ -109,8 +112,8 @@ export const ROUTES: RoutesType = {
     routeType: "authenticate",
     showHeader: true,
     showFooter: true,
-    headerName: "View Order",
     element: <ViewOrder />,
+    headerName: "View Order",
   },
   REPORT: {
     path: "/report",
@@ -118,6 +121,7 @@ export const ROUTES: RoutesType = {
     showHeader: true,
     showFooter: true,
     element: <Report />,
+    headerName: "Report",
   },
   ORDER: {
     path: "/order",
@@ -125,19 +129,20 @@ export const ROUTES: RoutesType = {
     showHeader: true,
     showFooter: true,
     element: <Order />,
+    headerName: "Orders",
   },
   REGISTER: {
     path: "/register",
     routeType: "un-authenticate",
-    showHeader: true,
-    showFooter: true,
+    showHeader: false,
+    showFooter: false,
     element: <Register />,
   },
   LOGIN: {
     path: "/login",
     routeType: "public",
-    showHeader: true,
-    showFooter: true,
+    showHeader: false,
+    showFooter: false,
     element: <Login />,
   },
   NOT_FOUND: {

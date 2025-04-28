@@ -53,7 +53,7 @@ export const useGetItemList = (menuId?: string, params?: object) => {
         },
       }),
     select: (res) => {
-      if (res.data?.data?.length) {
+      if (res.data?.data?.data?.length) {
         return res.data?.data;
       }
       return [];

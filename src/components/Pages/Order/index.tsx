@@ -12,8 +12,6 @@ const Order = () => {
   } = useOrderManagement();
   return (
     <div className="flex flex-col gap-2">
-      <h2 className="text-xl font-bold">Manage Orders</h2>
-
       <div className="w-full overflow-x-auto">
         <div className="min-w-[300px]">
           <CustomTable
