@@ -138,10 +138,10 @@ const AddEditItem = () => {
 
       if (isEdit) {
         await updateItems(formData);
-        dispatchToast("success", "Menu updated successfully");
+        dispatchToast("success", "Item updated successfully");
       } else {
         await createItems(formData);
-        dispatchToast("success", "Menu created successfully");
+        dispatchToast("success", "Item created successfully");
       }
 
       navigate(ROUTES.MENU.path);
