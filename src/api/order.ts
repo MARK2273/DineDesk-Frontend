@@ -1,6 +1,6 @@
 import { OrderFormData } from "@dine-desk/schema/order";
 import { useMutation, useQuery } from ".";
-import { axiosGet, axiosPost } from "./axios";
+import { axiosGet, axiosPost, axiosPut } from "./axios";
 import { orderQueryKeyMap } from "./common/orderQueryKey";
 import { useInvalidateQuery } from "./data-fetching";
 
@@ -54,5 +54,37 @@ export const useGetOrderDetails = (id: string | number) => {
       return [];
     },
     experimental_prefetchInRender: true,
+  });
+};
+
+interface OrderUpdatePayload {
+  orderId: number;
+  status: string;
+  items: {
+    id: number;
+    itemName: string;
+    price: number;
+    quantity: number;
+  }[];
+}
+
+export const useUpdateOrder = () => {
+  const { invalidate } = useInvalidateQuery();
+  return useMutation({
+    mutationKey: ["updateOrder"],
+    mutationFn: async (data: OrderUpdatePayload) => {
+      const orderId = data.orderId;
+      const res = await axiosPut(`/order/${orderId}`, {
+        data: data,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+      return res;
+    },
+    onSuccess: async () => {
+      await invalidate(orderQueryKeyMap.orderList());
+    },
   });
 };
