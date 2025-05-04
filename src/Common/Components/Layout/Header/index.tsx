@@ -41,15 +41,50 @@ const Header = () => {
     setSelectedOption(selected);
   };
 
-  useEffect(() => {
-    const storedRestaurantId = storage.getItem("restaurantId");
+  // useEffect(() => {
+  //   const storedRestaurantId = storage.getItem("restaurantId");
 
-    if (storedRestaurantId && data) {
+  //   if (storedRestaurantId && data) {
+  //     const existingRestaurant = data.find(
+  //       (option: OptionType) => option.value === storedRestaurantId
+  //     );
+
+  //     if (existingRestaurant) {
+  //       dispatch(
+  //         setRestaurant({
+  //           id: +existingRestaurant.value,
+  //           name: existingRestaurant.label,
+  //         })
+  //       );
+  //       setSelectedOption(existingRestaurant);
+  //     } else {
+  //       dispatch(removeRestaurant());
+  //       setSelectedOption(null);
+  //       storage.removeItem("restaurantId");
+  //     }
+  //   }
+  // }, [dataUpdatedAt, dispatch]);
+
+  useEffect(() => {
+    if (!data || data.length === 0) {
+      // No restaurants returned from API
+      dispatch(removeRestaurant());
+      setSelectedOption(null);
+      storage.removeItem("restaurantId");
+      return;
+    }
+
+    const storedRestaurantId = storage.getItem("restaurantId");
+    console.log("Stored Restaurant ID:", storedRestaurantId);
+    console.log("Data:", data);
+
+    if (storedRestaurantId) {
       const existingRestaurant = data.find(
-        (option: OptionType) => option.value === storedRestaurantId
+        (option: OptionType) => option.value.toString() === storedRestaurantId
       );
 
       if (existingRestaurant) {
+        // Valid restaurant ID in storage, restore it
         dispatch(
           setRestaurant({
             id: +existingRestaurant.value,
@@ -58,12 +93,24 @@ const Header = () => {
         );
         setSelectedOption(existingRestaurant);
       } else {
+        // Invalid restaurant ID in storage
         dispatch(removeRestaurant());
         setSelectedOption(null);
         storage.removeItem("restaurantId");
       }
+    } else {
+      // No stored ID — select first restaurant
+      const firstRestaurant = data[0];
+      dispatch(
+        setRestaurant({
+          id: +firstRestaurant.value,
+          name: firstRestaurant.label,
+        })
+      );
+      setSelectedOption(firstRestaurant);
+      storage.setItem("restaurantId", firstRestaurant.value);
     }
-  }, [dataUpdatedAt, dispatch]);
+  }, [dataUpdatedAt, data, dispatch]);
 
   if (isLoading) {
     return <SectionLoader />;
