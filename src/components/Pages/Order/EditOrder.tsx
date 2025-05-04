@@ -6,9 +6,18 @@ import SectionLoader from "@dine-desk/Common/Components/Loader/Spinner";
 import NotFound from "@dine-desk/Common/Components/NotFound";
 import { ROUTES } from "@dine-desk/constants/RoutePath";
 import { dispatchToast } from "@dine-desk/helper/toastHelper";
-import { extractErrors } from "@dine-desk/helper";
+import { extractErrors, getStatusColor, OrderStatus } from "@dine-desk/helper";
 import Button from "@dine-desk/Common/Components/Button";
 import clsx from "clsx";
+import CustomSelect, {
+  OptionType,
+} from "@dine-desk/Common/Components/FormField/CustomSelect";
+import { MultiValue, SingleValue } from "react-select";
+
+export const statusOptions = Object.values(OrderStatus).map((status) => ({
+  value: status,
+  label: status.charAt(0).toUpperCase() + status.slice(1),
+}));
 
 // TYPES
 interface MenuItem {
@@ -31,7 +40,7 @@ const EditOrder = () => {
   const navigate = useNavigate();
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
-  const [orderStatus, setOrderStatus] = useState<string>("pending");
+  const [orderStatus, setOrderStatus] = useState<OptionType>(statusOptions[0]);
   const { mutateAsync: updateOrder, isPending: isUpdateOrderPending } =
     useUpdateOrder();
 
@@ -54,7 +63,10 @@ const EditOrder = () => {
   useEffect(() => {
     if (orderData) {
       setSelectedItems(orderData.items || []);
-      setOrderStatus(orderData.status || "pending");
+      const initialStatus =
+        statusOptions.find((option) => option.value === orderData.status) ||
+        statusOptions[0];
+      setOrderStatus(initialStatus);
     }
   }, [orderData]);
 
@@ -99,15 +111,19 @@ const EditOrder = () => {
     return selectedItems.find((i) => i.id === id)?.quantity || 0;
   };
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setOrderStatus(e.target.value);
+  const handleStatusChange = (
+    newValue: MultiValue<OptionType> | SingleValue<OptionType>
+  ) => {
+    if (newValue && !Array.isArray(newValue)) {
+      setOrderStatus(newValue as OptionType);
+    }
   };
 
   const handleSubmit = async () => {
     try {
       const payload = {
         orderId: orderData?.orderId,
-        status: orderStatus,
+        status: orderStatus.value,
         items: selectedItems,
       };
 
@@ -118,21 +134,6 @@ const EditOrder = () => {
     } catch (error: any) {
       const errors = extractErrors(error);
       dispatchToast("error", errors || "Something went wrong");
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "preparing":
-        return "bg-blue-100 text-blue-800";
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -152,22 +153,20 @@ const EditOrder = () => {
         <div className="flex items-center gap-4 w-full md:w-auto">
           <div
             className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-              orderStatus
+              orderStatus.value as OrderStatus
             )}`}
           >
-            {orderStatus.toUpperCase()}
+            {orderStatus.value.toUpperCase()}
           </div>
 
-          <select
+          <CustomSelect
+            options={statusOptions}
             value={orderStatus}
             onChange={handleStatusChange}
-            className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="pending">Pending</option>
-            <option value="preparing">Preparing</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+            placeholder="Select Status"
+            isClearable={false}
+            isDisabled={false}
+          />
         </div>
       </div>
 
@@ -351,10 +350,10 @@ const EditOrder = () => {
               </label>
               <div
                 className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                  orderStatus
+                  orderStatus.value as OrderStatus
                 )}`}
               >
-                {orderStatus.toUpperCase()}
+                {orderStatus.value.toUpperCase()}
               </div>
             </div>
 

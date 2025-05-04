@@ -26,9 +26,9 @@ const Login = () => {
   const onSubmit = async (data: loginData) => {
     try {
       const loginData = await loginUser(data);
-      dispatchToast("success", "Login successful");
       const storage = storageHelper("session");
       if (loginData) storage.setItem("token", loginData.token);
+      dispatchToast("success", "Login successful");
 
       navigate(ROUTES.DASHBOARD.path);
     } catch (error: any) {
