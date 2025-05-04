@@ -3,7 +3,7 @@ import Icon from "@dine-desk/Common/Components/Icon";
 import { useTableManagement } from "@dine-desk/Common/Components/Table";
 import Tooltip from "@dine-desk/Common/Components/ToolTip";
 import { ROUTES } from "@dine-desk/constants/RoutePath";
-import { formatDate, getStatusColor } from "@dine-desk/helper";
+import { formatDate, getStatusColor, OrderStatus } from "@dine-desk/helper";
 import { RootState } from "@dine-desk/redux/store";
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
@@ -23,7 +23,7 @@ interface Order {
   id: number;
   restaurantId: number;
   totalAmount: number;
-  status: "pending" | "preparing" | "completed" | "cancelled";
+  status: OrderStatus;
   createdAt: string;
   orderItems: OrderItem[];
 }

@@ -6,7 +6,7 @@ import SectionLoader from "@dine-desk/Common/Components/Loader/Spinner";
 import NotFound from "@dine-desk/Common/Components/NotFound";
 import { ROUTES } from "@dine-desk/constants/RoutePath";
 import { dispatchToast } from "@dine-desk/helper/toastHelper";
-import { extractErrors, getStatusColor } from "@dine-desk/helper";
+import { extractErrors, getStatusColor, OrderStatus } from "@dine-desk/helper";
 import Button from "@dine-desk/Common/Components/Button";
 import clsx from "clsx";
 import CustomSelect, {
@@ -14,12 +14,10 @@ import CustomSelect, {
 } from "@dine-desk/Common/Components/FormField/CustomSelect";
 import { MultiValue, SingleValue } from "react-select";
 
-const statusOptions = [
-  { value: "pending", label: "Pending" },
-  { value: "preparing", label: "Preparing" },
-  { value: "completed", label: "Completed" },
-  { value: "cancelled", label: "Cancelled" },
-];
+export const statusOptions = Object.values(OrderStatus).map((status) => ({
+  value: status,
+  label: status.charAt(0).toUpperCase() + status.slice(1),
+}));
 
 // TYPES
 interface MenuItem {
@@ -155,7 +153,7 @@ const EditOrder = () => {
         <div className="flex items-center gap-4 w-full md:w-auto">
           <div
             className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-              orderStatus.value
+              orderStatus.value as OrderStatus
             )}`}
           >
             {orderStatus.value.toUpperCase()}
@@ -352,7 +350,7 @@ const EditOrder = () => {
               </label>
               <div
                 className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                  orderStatus.value
+                  orderStatus.value as OrderStatus
                 )}`}
               >
                 {orderStatus.value.toUpperCase()}

@@ -36,15 +36,23 @@ export const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleString("en-IN", options);
 };
 
-export const getStatusColor = (status: string) => {
+// Define enum for order status
+export enum OrderStatus {
+  PENDING = "pending",
+  PREPARING = "preparing",
+  COMPLETED = "completed",
+  CANCELLED = "cancelled",
+}
+
+export const getStatusColor = (status: OrderStatus) => {
   switch (status) {
-    case "pending":
+    case OrderStatus.PENDING:
       return "bg-yellow-100 text-yellow-800";
-    case "preparing":
+    case OrderStatus.PREPARING:
       return "bg-blue-100 text-blue-800";
-    case "completed":
+    case OrderStatus.COMPLETED:
       return "bg-green-100 text-green-800";
-    case "cancelled":
+    case OrderStatus.CANCELLED:
       return "bg-red-100 text-red-800";
     default:
       return "bg-gray-100 text-gray-800";
