@@ -1,24 +1,36 @@
-// import NotFound from "@dine-desk/";
-import { RouteObject } from "react-router-dom";
-import NotFound from "../Common/Components/NotFound";
-import Dashboard from "../components/Pages/Dashboard";
-import Menu from "../components/Pages/Menu";
-import Restaurant from "../components/Pages/Restaurant";
-import Report from "../components/Pages/Report";
-import Order from "../components/Pages/Order";
-import Login from "../components/Pages/Login/Login";
-import Root from "../components/Pages/Root";
-import AddEditItem from "../components/Pages/Menu/AddEditItem";
-import ViewMenu from "@dine-desk/components/Pages/Menu/ViewMenu";
-import Register from "@dine-desk/components/Pages/Login/Register";
-import EditOrder from "@dine-desk/components/Pages/Order/EditOrder";
-import ViewOrder from "@dine-desk/components/Pages/Order/ViewOrder";
+import { RouteObject, Navigate } from "react-router-dom";
+import React from "react";
 
-// import NotFound from "@dine-desk/Common/Components/NotFound";
-
-// const Profile = React.lazy(
-//   () => import("@entity-manager/components/Pages/Profile")
-// );
+const Dashboard = React.lazy(
+  () => import("@dine-desk/components/Pages/Dashboard")
+);
+const Menu = React.lazy(() => import("@dine-desk/components/Pages/Menu"));
+const NotFound = React.lazy(
+  () => import("@dine-desk/Common/Components/NotFound")
+);
+const Restaurant = React.lazy(
+  () => import("@dine-desk/components/Pages/Restaurant")
+);
+const Report = React.lazy(() => import("@dine-desk/components/Pages/Report"));
+const Order = React.lazy(() => import("@dine-desk/components/Pages/Order"));
+const Login = React.lazy(
+  () => import("@dine-desk/components/Pages/Login/Login")
+);
+const AddEditItem = React.lazy(
+  () => import("@dine-desk/components/Pages/Menu/AddEditItem")
+);
+const ViewMenu = React.lazy(
+  () => import("@dine-desk/components/Pages/Menu/ViewMenu")
+);
+const EditOrder = React.lazy(
+  () => import("@dine-desk/components/Pages/Order/EditOrder")
+);
+const ViewOrder = React.lazy(
+  () => import("@dine-desk/components/Pages/Order/ViewOrder")
+);
+const Register = React.lazy(
+  () => import("@dine-desk/components/Pages/Login/Register")
+);
 
 export type RoutesType = {
   [key in
@@ -52,8 +64,8 @@ export type RoutesType = {
 export const ROUTES: RoutesType = {
   DEFAULT: {
     path: "/",
-    routeType: "public",
-    element: <Root />,
+    routeType: "un-authenticate",
+    element: <Navigate to="/login" />,
   },
   DASHBOARD: {
     path: "/dashboard",
@@ -140,7 +152,7 @@ export const ROUTES: RoutesType = {
   },
   LOGIN: {
     path: "/login",
-    routeType: "public",
+    routeType: "un-authenticate",
     showHeader: false,
     showFooter: false,
     element: <Login />,

@@ -35,7 +35,7 @@ const EditOrder = () => {
   const { mutateAsync: updateOrder, isPending: isUpdateOrderPending } =
     useUpdateOrder();
 
-  if (!orderId) return <NotFound path="/" />;
+  if (!orderId) return <NotFound path="/" />
 
   const {
     data: orderData,
