@@ -46,7 +46,7 @@ const Header = () => {
 
     if (storedRestaurantId && data) {
       const existingRestaurant = data.find(
-        (option: OptionType) => option.value === +storedRestaurantId
+        (option: OptionType) => option.value === storedRestaurantId
       );
 
       if (existingRestaurant) {

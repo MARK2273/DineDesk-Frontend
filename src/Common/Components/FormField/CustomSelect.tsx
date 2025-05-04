@@ -2,7 +2,7 @@ import React from "react";
 import Select, { ActionMeta, MultiValue, SingleValue } from "react-select";
 
 export interface OptionType {
-  value: number;
+  value: string;
   label: string;
 }
 
