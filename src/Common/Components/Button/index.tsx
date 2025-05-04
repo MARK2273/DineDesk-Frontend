@@ -102,7 +102,7 @@ export const Button = ({
     >
       {children && children}
       {isLoading ? (
-        <span className="relative h-4 w-4 border-[3px] border-Gray-900 border-b-white rounded-full block animate-spin" />
+        <span className="relative h-4 w-4 border-[3px] border-gray-900 border-b-white rounded-full block animate-spin" />
       ) : iconFirst && icon ? (
         <span className="">{icon}</span>
       ) : null}
