@@ -89,15 +89,15 @@ const AddEditItem = () => {
   });
 
   useEffect(() => {
-    if (data) {
+    if (data?.data) {
       reset({
-        items: data.map((item: MenuItemType) => ({
+        items: data?.data?.map((item: MenuItemType) => ({
           ...item,
           price: item.price?.toString(),
         })),
       });
     }
-    setIsEdit(data?.length > 0);
+    setIsEdit(data?.data?.length > 0);
   }, [dataUpdatedAt, reset]);
 
   const onSubmit = async (data: ItamData) => {

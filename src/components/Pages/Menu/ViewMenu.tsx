@@ -118,6 +118,14 @@ const ViewMenu = () => {
           <div className="space-y-6">
             <Skeleton count={4} className="h-28 w-full rounded-lg" />
           </div>
+        ) : !data?.data || data?.data.length === 0 ? (
+          <div className="flex flex-col items-center justify-center text-center mt-20 px-4 text-gray-700">
+            <h2 className="text-xl font-semibold mb-2">No items available</h2>
+            <p className="text-sm text-gray-500 max-w-md">
+              We couldn't find any items for this menu. Please check back later
+              or try a different restaurant.
+            </p>
+          </div>
         ) : selectedCategory === "All" ? (
           Object.keys(groupedMenu).map((category) => (
             <div key={category} className="space-y-6">
