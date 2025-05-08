@@ -24,6 +24,7 @@
     "@tippyjs/react": "^4.2.6",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.10.4",
     "lodash": "^4.17.21",
     "path": "^0.12.7",
     "react": "^18.3.1",
