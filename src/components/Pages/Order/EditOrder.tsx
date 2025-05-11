@@ -114,16 +114,16 @@ const EditOrder = () => {
     });
   };
 
-  const updateItemNotes = (id: number, notes: string) => {
-    setItemNotes((prev) => ({ ...prev, [id]: notes }));
-    setSelectedItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, notes } : item))
-    );
-  };
+  // const updateItemNotes = (id: number, notes: string) => {
+  //   setItemNotes((prev) => ({ ...prev, [id]: notes }));
+  //   setSelectedItems((prev) =>
+  //     prev.map((item) => (item.id === id ? { ...item, notes } : item))
+  //   );
+  // };
 
-  const removeItem = (id: number) => {
-    setSelectedItems((prev) => prev.filter((item) => item.id !== id));
-  };
+  // const removeItem = (id: number) => {
+  //   setSelectedItems((prev) => prev.filter((item) => item.id !== id));
+  // };
 
   const getItemQuantity = (id: number): number => {
     return selectedItems.find((i) => i.id === id)?.quantity || 0;
