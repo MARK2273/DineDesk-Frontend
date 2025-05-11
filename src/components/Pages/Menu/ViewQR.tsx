@@ -8,9 +8,15 @@ interface ViewQRModalProps {
   open: boolean;
   onClose: () => void;
   id?: string;
+  menuName?: string;
 }
 
-const ViewQR: React.FC<ViewQRModalProps> = ({ id, open, onClose }) => {
+const ViewQR: React.FC<ViewQRModalProps> = ({
+  id,
+  open,
+  onClose,
+  menuName,
+}) => {
   const qrRef = useRef<HTMLDivElement>(null);
   const qrValue = `${APP_BASE_URL}/view-menu/${id}`;
 
@@ -32,7 +38,7 @@ const ViewQR: React.FC<ViewQRModalProps> = ({ id, open, onClose }) => {
 
       const downloadLink = document.createElement("a");
       downloadLink.href = pngFile;
-      downloadLink.download = `QR_Code_${id}.png`;
+      downloadLink.download = `DineDesk_${menuName || `Menu_${id}`}_QR.png`;
       document.body.appendChild(downloadLink);
       downloadLink.click();
       document.body.removeChild(downloadLink);
@@ -42,39 +48,51 @@ const ViewQR: React.FC<ViewQRModalProps> = ({ id, open, onClose }) => {
   };
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title="View Menu"
-      width="sm"
-      ParentClassName="!bg-opacity-50"
-      TitleClassname="!text-gray-900 font-semibold"
-    >
-      <div className="flex flex-col items-center justify-center p-6 gap-4">
-        {/* QR Code */}
-        <div ref={qrRef} className="p-4 bg-white rounded-lg shadow-md border">
-          <QRCode value={qrValue} size={180} />
+    <Modal open={open} onClose={onClose} title="Menu QR Code" width="sm">
+      <div className="flex flex-col items-center p-6 space-y-6">
+        {menuName && (
+          <h3 className="text-lg font-medium text-gray-800 text-center">
+            {menuName}
+          </h3>
+        )}
+
+        <div
+          ref={qrRef}
+          className="p-4 bg-white rounded-lg border-2 border-gray-200 shadow-sm"
+        >
+          <QRCode
+            value={qrValue}
+            size={180}
+            bgColor="#ffffff"
+            fgColor="#111827"
+            level="H" // High error correction
+          />
         </div>
 
-        {/* Link Display */}
-        <p className="text-sm text-gray-600 bg-gray-100 px-4 py-2 rounded-md break-all">
-          {qrValue}
-        </p>
+        <div className="w-full space-y-4">
+          <div className="bg-gray-50 p-3 rounded-lg">
+            <p className="text-xs text-gray-500 mb-1">Menu Link</p>
+            <p className="text-sm text-gray-700 break-all font-mono">
+              {qrValue}
+            </p>
+          </div>
 
-        {/* Buttons */}
-        <div className="flex gap-4">
-          <Button
-            variant="filled"
-            title="Download QR"
-            onClick={handleDownload}
-            className="px-4 py-2 cursor-pointer text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 transition"
-          />
-          <Button
-            variant="filled"
-            title="Close"
-            onClick={onClose}
-            className="px-4 py-2 cursor-pointer text-white bg-gray-600 rounded-lg shadow hover:bg-gray-700 transition"
-          />
+          <div className="flex justify-center space-x-4">
+            <Button
+              variant="filled"
+              onClick={handleDownload}
+              className="bg-yellow-600 hover:bg-yellow-700"
+            >
+              Download QR
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="border-gray-300 hover:bg-gray-50"
+            >
+              Close
+            </Button>
+          </div>
         </div>
       </div>
     </Modal>

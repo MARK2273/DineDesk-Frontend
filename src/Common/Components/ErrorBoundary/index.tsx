@@ -1,5 +1,5 @@
-import React, { Component, ReactNode } from 'react';
-import Error from './Error';
+import React, { Component, ReactNode } from "react";
+import Error from "./Error";
 
 // Define the types for the state
 interface ErrorBoundaryState {
@@ -26,8 +26,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   componentDidCatch(error: Error, info: React.ErrorInfo): void {
     // You can log the error to an external service
-    console.error('Error occurred: ', error);
-    console.error('Error info: ', info);
+    console.error("Error occurred: ", error);
+    console.error("Error info: ", info);
   }
 
   render() {

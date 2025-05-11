@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { ROUTES } from "../../../../constants/RoutePath";
 import Tooltip from "../../ToolTip";
 import Icon, { IconNameType } from "../../Icon";
@@ -16,130 +16,92 @@ const menuItems: { icon: IconNameType; label: string; path: string }[] = [
   { icon: "restaurant", label: "Restaurant", path: ROUTES.RESTAURANT.path },
   { icon: "menu", label: "Menu", path: ROUTES.MENU.path },
   { icon: "order", label: "Orders", path: ROUTES.ORDER.path },
-  { icon: "report", label: "Repors", path: ROUTES.REPORT.path },
+  { icon: "report", label: "Reports", path: ROUTES.REPORT.path },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({
-  toggleSidebar,
-  isSidebarOpen = window.innerWidth >= 1200,
-}) => {
-  const location = useLocation();
+const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar, isSidebarOpen }) => {
   const navigate = useNavigate();
   const storage = storageHelper("session");
-  const activeItem: string =
-    menuItems.find((el) => location.pathname.includes(el.path))?.label ||
-    menuItems[0].label;
 
   const handleLogoClick = () => {
-    navigate(ROUTES.DEFAULT.path);
+    toggleSidebar();
   };
   const handleLogout = () => {
-    storage.removeItem("token"); // Clear token from session storage
-    navigate(ROUTES.LOGIN.path); // Redirect to login page
+    storage.removeItem("token");
+    navigate(ROUTES.LOGIN.path);
   };
 
   return (
-    <div
+    <aside
       className={clsx(
-        "fixed z-20 bg-gray-100 h-full transition-all duration-300 ease-in-out",
-        isSidebarOpen ? "w-64" : "w-16"
+        "fixed inset-y-0 z-20 bg-white shadow-lg transition-all duration-300 ease-in-out",
+        "flex flex-col border-r border-gray-200",
+        isSidebarOpen ? "w-64" : "w-20"
       )}
     >
-      {/* Sidebar Header */}
-      <div className="relative py-4 h-20 flex items-center">
-        <div
-          className={clsx(
-            "relative cursor-pointer w-full ease-in-out duration-300 transition-all",
-            isSidebarOpen ? "px-5" : "px-2 pr-3"
-          )}
-          onClick={handleLogoClick}
-        >
-          {isSidebarOpen ? <>Dine Desk</> : <>DD</>}
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleSidebar();
-            }}
-            className={clsx(
-              "absolute -right-3 top-2/4 -translate-y-2/4 z-10 bg-blue-800 border-2 border-solid border-white shadow-inner w-6 h-6 rounded-full flex items-center justify-center cursor-pointer transition-all ease-in-out",
-              isSidebarOpen ? "rotate-180" : "rotate-0"
-            )}
-          >
-            <Icon name="leftArrow" />
-          </div>
-        </div>
+      <div
+        className={clsx(
+          "flex items-center justify-center h-16 px-4 cursor-pointer",
+          "bg-yellow-100 border-b border-yellow-200"
+        )}
+        onClick={handleLogoClick}
+      >
+        {isSidebarOpen ? (
+          <span className="text-xl font-bold text-yellow-800">Dine Desk</span>
+        ) : (
+          <span className="text-xl font-bold text-yellow-800">DD</span>
+        )}
       </div>
 
-      {/* Sidebar Menu */}
-      <ul className="pl-2.5 flex flex-col gap-5 h-[calc(100%-100px)] overflow-y-auto overflow-x-hidden mt-5">
-        {menuItems.map((item, index) => (
-          <Tooltip
-            key={index}
-            content={item.label}
-            placement="right"
-            className={clsx(isSidebarOpen ? "hidden" : "block")}
-          >
-            <li key={index} className="relative">
-              <NavLink
-                to={item.path}
-                className={clsx(
-                  "relative flex items-center gap-2 px-3 py-2 cursor-pointer after:transition-all after:duration-300 after:ease-in-out after:absolute after:right-0 after:h-full after:bg-transparent after:rounded-l-full hover:text-blue-800",
-                  isSidebarOpen ? "after:w-2.5" : "after:w-5px",
-                  activeItem === item.label ? "after:!bg-blue-800" : "",
-                  activeItem === item.label ? "text-blue-800" : "text-gray-600"
-                )}
+      <nav className="flex-1 overflow-y-auto py-4">
+        <ul className="space-y-1 px-2">
+          {menuItems.map((item, index) => (
+            <li key={index}>
+              <Tooltip
+                content={item.label}
+                placement="right"
+                disabled={isSidebarOpen}
               >
-                <Icon
-                  name={item.icon}
-                  className="w-6 transition-all duration-300 ease-in-out"
-                />
-                <span
-                  className={clsx(
-                    "text-lg font-medium leading-6 truncate transition-all duration-300 ease-in-out",
-                    isSidebarOpen ? "w-[calc(100%-32px)]" : "w-0"
-                  )}
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
+                    clsx(
+                      "flex items-center p-3 mx-2 rounded-lg transition-colors",
+                      "hover:bg-yellow-50 hover:text-yellow-700",
+                      isActive
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "text-gray-600",
+                      isSidebarOpen ? "justify-start" : "justify-center"
+                    )
+                  }
                 >
-                  {item.label}
-                </span>
-              </NavLink>
+                  <Icon name={item.icon} />
+                  {isSidebarOpen && (
+                    <span className="ml-3 font-medium">{item.label}</span>
+                  )}
+                </NavLink>
+              </Tooltip>
             </li>
-          </Tooltip>
-        ))}
-      </ul>
-      <div className="absolute bottom-4 left-0 w-full">
-        <Tooltip
-          content="Logout"
-          placement="right"
-          className={clsx(isSidebarOpen ? "hidden" : "block")}
-        >
-          {/* <div className="absolute bottom-4 left-0 w-full"> */}
+          ))}
+        </ul>
+      </nav>
+
+      <div className="p-4 border-t border-gray-200 ">
+        <Tooltip content="Logout" placement="right" disabled={isSidebarOpen}>
           <button
             onClick={handleLogout}
             className={clsx(
-              "relative flex items-center gap-2 w-full px-3 py-2 cursor-pointer transition-all",
-              "after:transition-all after:duration-300 after:ease-in-out after:absolute after:right-0 after:h-full after:bg-transparent after:rounded-l-full",
-              "hover:text-red-600",
-              isSidebarOpen ? "after:w-2.5" : "after:w-[5px]",
-              "text-gray-600"
+              "flex items-center w-full p-3 rounded-lg transition-colors cursor-pointer",
+              "hover:bg-red-50 hover:text-red-600 text-gray-600",
+              isSidebarOpen ? "justify-start" : "justify-center"
             )}
           >
-            <Icon
-              name="logout"
-              className="w-6 transition-all duration-300 ease-in-out"
-            />
-            <span
-              className={clsx(
-                "text-lg font-medium leading-6 truncate transition-all duration-300 ease-in-out",
-                isSidebarOpen ? "w-[calc(100%-32px)]" : "w-0"
-              )}
-            >
-              Logout
-            </span>
+            <Icon name="logout" />
+            {isSidebarOpen && <span className="ml-3 font-medium">Logout</span>}
           </button>
-          {/* </div> */}
         </Tooltip>
       </div>
-    </div>
+    </aside>
   );
 };
 

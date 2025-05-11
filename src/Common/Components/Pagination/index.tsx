@@ -1,12 +1,15 @@
 import { Table } from "@tanstack/react-table";
 import clsx from "clsx";
 import Icon from "../Icon";
+import Button from "../Button";
 
 interface PaginationProps<T> {
   table: Table<T>;
   currentPage: number;
   totalPages: number;
   setCurrentPage?: React.Dispatch<React.SetStateAction<number>>;
+  className?: string;
+  showPageNumbers?: boolean;
 }
 
 export const Pagination = <T,>({
@@ -14,6 +17,8 @@ export const Pagination = <T,>({
   currentPage,
   totalPages,
   setCurrentPage,
+  className = "",
+  showPageNumbers = true,
 }: PaginationProps<T>) => {
   const handlePageChange = (pageIndex: number) => {
     table.setPageIndex(pageIndex);
@@ -22,15 +27,13 @@ export const Pagination = <T,>({
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      table.setPageIndex(currentPage);
-      if (setCurrentPage) setCurrentPage(currentPage + 1);
+      handlePageChange(currentPage);
     }
   };
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      table.setPageIndex(currentPage - 2);
-      if (setCurrentPage) setCurrentPage(currentPage - 1);
+      handlePageChange(currentPage - 2);
     }
   };
 
@@ -59,9 +62,8 @@ export const Pagination = <T,>({
   };
 
   return (
-    <div className="mt-2 flex items-center justify-end gap-2 sm:gap-6">
-      <div className="flex items-center gap-2 md:gap-5">
-        {/* Previous button */}
+    <div className={clsx("flex items-center justify-between mt-4", className)}>
+      <div className="flex items-center gap-2">
         <div
           className={clsx(
             "cursor-pointer",
@@ -70,33 +72,40 @@ export const Pagination = <T,>({
         >
           <Icon name="paginationLeftarrow" onClick={handlePreviousPage} />
         </div>
+        {showPageNumbers && (
+          <div className="hidden sm:flex items-center gap-1">
+            {getPageNumbers().map((page, index) => (
+              <Button
+                key={index}
+                variant={currentPage === page ? "filled" : "outline"}
+                size="sm"
+                className={clsx(
+                  "!px-3 min-w-[2.25rem] bg-amber-400",
+                  page === "..." && "!bg-transparent !border-transparent"
+                )}
+                onClick={() =>
+                  page !== "..." && handlePageChange(Number(page) - 1)
+                }
+                disabled={page === "..."}
+              >
+                {page}
+              </Button>
+            ))}
+          </div>
+        )}
 
-        <ul className="hidden md:flex items-center gap-1">
-          {getPageNumbers().map((page, index) => (
-            <li
-              key={index}
-              onClick={() =>
-                page !== "..." && handlePageChange(Number(page) - 1)
-              }
-              className={clsx(
-                "flex items-center justify-center rounded-md text-sm font-semibold w-9 h-9",
-                page === "..." && "cursor-default text-gray-400",
-                page !== "..." &&
-                  currentPage !== page &&
-                  "cursor-pointer hover:bg-gray-200",
-                currentPage === page && "bg-blue-600 text-white cursor-default"
-              )}
+        {showPageNumbers && (
+          <div className="sm:hidden flex items-center">
+            <Button
+              variant="filled"
+              size="sm"
+              className="!px-3 min-w-[2.25rem]"
+              disabled
             >
-              <button disabled={page === "..."}>{page}</button>
-            </li>
-          ))}
-        </ul>
-
-        <ul className="block md:hidden">
-          <li className="flex items-center justify-center w-8 h-8 rounded-md bg-blue-600 text-white text-sm font-semibold">
-            {currentPage}
-          </li>
-        </ul>
+              {currentPage}
+            </Button>
+          </div>
+        )}
 
         <div
           className={clsx(

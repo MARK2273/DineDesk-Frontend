@@ -1,4 +1,4 @@
-import React, { Fragment, PropsWithChildren } from 'react';
+import React, { Fragment, PropsWithChildren } from "react";
 
 interface RepeaterProps extends PropsWithChildren {
   count?: number;

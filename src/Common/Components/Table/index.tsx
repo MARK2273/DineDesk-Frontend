@@ -14,6 +14,7 @@ import Icon from "../Icon";
 import NoDataFound from "../NoDataFound";
 import Skeleton from "../Skeleton/Skeleton";
 import Pagination from "../Pagination";
+import clsx from "clsx";
 
 interface CommonTableProps<T> {
   data: T[];
@@ -23,6 +24,10 @@ interface CommonTableProps<T> {
   setCurrentPage?: React.Dispatch<React.SetStateAction<number>>;
   currentPage?: number;
   showPagination?: boolean;
+  className?: string;
+  rowClassName?: string | ((row: T) => string);
+  headerClassName?: string;
+  emptyState?: React.ReactNode;
 }
 
 export const CustomTable = <T,>({
@@ -33,6 +38,10 @@ export const CustomTable = <T,>({
   currentPage,
   setCurrentPage,
   showPagination = true,
+  className,
+  rowClassName,
+  headerClassName,
+  emptyState,
 }: CommonTableProps<T>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection] = useState<RowSelectionState>({});
@@ -65,20 +74,24 @@ export const CustomTable = <T,>({
   }, [currentPage, data]);
 
   const totalPages = totalRows
-    ? Math.ceil((totalRows || data?.length || 10) / 10) //divided by pageSize
+    ? Math.ceil((totalRows || data?.length || 10) / 10)
     : 0;
 
   return (
-    <div className="rounded-lg w-full" ref={tableRef}>
-      <div className="rounded-lg shadow-lg overflow-hidden bg-white">
-        <table className="w-full border border-gray-200 rounded-lg">
-          <thead className="bg-gray-100 border-b border-gray-300">
+    <div className={clsx("w-full flex flex-col", className)} ref={tableRef}>
+      <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm bg-white">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className={clsx("bg-gray-50", headerClassName)}>
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="text-left text-gray-700">
+              <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="px-6 py-4 text-sm font-semibold tracking-wide cursor-pointer select-none hover:text-gray-900 transition"
+                    className={clsx(
+                      "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider",
+                      header.column.getCanSort() &&
+                        "cursor-pointer hover:bg-gray-100"
+                    )}
                     onClick={header.column.getToggleSortingHandler()}
                   >
                     <div className="flex items-center justify-between">
@@ -87,15 +100,27 @@ export const CustomTable = <T,>({
                         header.getContext()
                       )}
                       {header.column.getCanSort() && (
-                        <Icon
-                          name={
-                            header.column.getIsSorted() === "asc"
-                              ? "ascSorting"
-                              : header.column.getIsSorted() === "desc"
-                              ? "descSorting"
-                              : "sorting"
-                          }
-                        />
+                        <span className="ml-2">
+                          {/* <Icon
+                            name={
+                              header.column.getIsSorted() === "asc"
+                                ? "chevronUp"
+                                : header.column.getIsSorted() === "desc"
+                                ? "chevronDown"
+                                : "sort"
+                            }
+                            className="w-4 h-4 text-gray-400"
+                          /> */}
+                          <Icon
+                            name={
+                              header.column.getIsSorted() === "asc"
+                                ? "ascSorting"
+                                : header.column.getIsSorted() === "desc"
+                                ? "descSorting"
+                                : "sorting"
+                            }
+                          />
+                        </span>
                       )}
                     </div>
                   </th>
@@ -104,14 +129,13 @@ export const CustomTable = <T,>({
             ))}
           </thead>
 
-          {/* Table Body */}
-          <tbody className="text-gray-800">
+          <tbody className="bg-white divide-y divide-gray-200">
             {isLoading ? (
               Array.from({ length: 5 }).map((_, index) => (
-                <tr key={index} className="border-b border-gray-200">
+                <tr key={index}>
                   {columns.map((_, colIndex) => (
                     <td key={colIndex} className="px-6 py-4">
-                      <Skeleton className="h-6 w-20 bg-gray-300 rounded-md" />
+                      <Skeleton className="h-4 w-full" />
                     </td>
                   ))}
                 </tr>
@@ -120,12 +144,17 @@ export const CustomTable = <T,>({
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="border-b border-gray-200 hover:bg-gray-50 transition"
+                  className={clsx(
+                    "hover:bg-gray-50 transition-colors",
+                    typeof rowClassName === "function"
+                      ? rowClassName(row.original)
+                      : rowClassName
+                  )}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td
                       key={cell.id}
-                      className="px-6 py-4 text-sm text-gray-700"
+                      className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -137,33 +166,27 @@ export const CustomTable = <T,>({
               ))
             ) : (
               <tr>
-                <td colSpan={columns.length} className="px-6 py-10 text-center">
-                  <NoDataFound />
+                <td colSpan={columns.length} className="px-6 py-12 text-center">
+                  {emptyState || <NoDataFound />}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
-      {data?.length > 0 && (
-        <div className="relative">
-          {showPagination && currentPage && (
-            <div className="flex justify-between items-center gap-3 mt-4">
-              <div className="text-sm md:text-base text-Gray-700">
-                {`Showing ${table.getRowModel().rows.length} out of ${
-                  totalRows || data.length
-                } results`}
-              </div>
-              <Pagination
-                table={table}
-                setCurrentPage={setCurrentPage}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                // pageSize={pageSize}
-                // setPageSize={setPageSize}
-              />
-            </div>
-          )}
+
+      {showPagination && currentPage && data?.length > 0 && (
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4 px-2">
+          <div className="text-sm text-gray-600">
+            Showing {table.getRowModel().rows.length} of{" "}
+            {totalRows || data.length} items
+          </div>
+          <Pagination
+            table={table}
+            setCurrentPage={setCurrentPage}
+            currentPage={currentPage}
+            totalPages={totalPages}
+          />
         </div>
       )}
     </div>

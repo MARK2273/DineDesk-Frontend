@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import CustomSelect, { OptionType } from "../../FormField/CustomSelect";
 import { useGetRestaurantList } from "@dine-desk/api/restaurant";
-import SectionLoader from "../../Loader/Spinner";
 import { MultiValue, SingleValue } from "react-select";
 import { storageHelper } from "@dine-desk/helper/storageHelper";
 import { useDispatch } from "react-redux";
@@ -21,8 +20,7 @@ const Header = () => {
     matchPath(route.path, location.pathname)
   );
 
-  const { data, isLoading, dataUpdatedAt } = useGetRestaurantList();
-
+  const { data, dataUpdatedAt, isLoading } = useGetRestaurantList();
   const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
 
   const handleSelectChange = (
@@ -41,33 +39,8 @@ const Header = () => {
     setSelectedOption(selected);
   };
 
-  // useEffect(() => {
-  //   const storedRestaurantId = storage.getItem("restaurantId");
-
-  //   if (storedRestaurantId && data) {
-  //     const existingRestaurant = data.find(
-  //       (option: OptionType) => option.value === storedRestaurantId
-  //     );
-
-  //     if (existingRestaurant) {
-  //       dispatch(
-  //         setRestaurant({
-  //           id: +existingRestaurant.value,
-  //           name: existingRestaurant.label,
-  //         })
-  //       );
-  //       setSelectedOption(existingRestaurant);
-  //     } else {
-  //       dispatch(removeRestaurant());
-  //       setSelectedOption(null);
-  //       storage.removeItem("restaurantId");
-  //     }
-  //   }
-  // }, [dataUpdatedAt, dispatch]);
-
   useEffect(() => {
     if (!data || data.length === 0) {
-      // No restaurants returned from API
       dispatch(removeRestaurant());
       setSelectedOption(null);
       storage.removeItem("restaurantId");
@@ -75,16 +48,12 @@ const Header = () => {
     }
 
     const storedRestaurantId = storage.getItem("restaurantId");
-    console.log("Stored Restaurant ID:", storedRestaurantId);
-    console.log("Data:", data);
-
     if (storedRestaurantId) {
       const existingRestaurant = data.find(
         (option: OptionType) => option.value.toString() === storedRestaurantId
       );
 
       if (existingRestaurant) {
-        // Valid restaurant ID in storage, restore it
         dispatch(
           setRestaurant({
             id: +existingRestaurant.value,
@@ -93,13 +62,11 @@ const Header = () => {
         );
         setSelectedOption(existingRestaurant);
       } else {
-        // Invalid restaurant ID in storage
         dispatch(removeRestaurant());
         setSelectedOption(null);
         storage.removeItem("restaurantId");
       }
     } else {
-      // No stored ID — select first restaurant
       const firstRestaurant = data[0];
       dispatch(
         setRestaurant({
@@ -110,25 +77,31 @@ const Header = () => {
       setSelectedOption(firstRestaurant);
       storage.setItem("restaurantId", firstRestaurant.value);
     }
-  }, [dataUpdatedAt, data, dispatch]);
-
-  if (isLoading) {
-    return <SectionLoader />;
-  }
+  }, [dataUpdatedAt, dispatch]);
 
   return (
-    <header className="bg-white shadow-md flex items-center justify-between px-6 py-4">
-      <h1 className="text-lg font-semibold">
-        {routeData?.headerName || "Dashboard"}
-      </h1>
-      <CustomSelect
-        options={data}
-        value={selectedOption}
-        onChange={handleSelectChange}
-        placeholder="Choose Restaurant"
-        isClearable={true}
-        isDisabled={false}
-      />
+    <header className="sticky top-0 z-10 bg-white shadow-sm">
+      <div className="flex items-center justify-between px-4 py-3 md:px-6">
+        <div className="flex items-center gap-4">
+          {/* Mobile sidebar toggle */}
+
+          <h1 className="text-xl font-semibold text-gray-800">
+            {routeData?.headerName || "Dashboard"}
+          </h1>
+        </div>
+
+        <div className="w-64">
+          <CustomSelect
+            options={data}
+            value={selectedOption}
+            onChange={handleSelectChange}
+            placeholder="Choose Restaurant"
+            isClearable={true}
+            isDisabled={false}
+            isLoading={isLoading}
+          />
+        </div>
+      </div>
     </header>
   );
 };

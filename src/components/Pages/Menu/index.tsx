@@ -4,6 +4,9 @@ import CustomTable from "@dine-desk/Common/Components/Table";
 import useMenuManagement from "./hooks";
 import { ConfirmModal } from "@dine-desk/Common/Components/Modal";
 import ViewQR from "./ViewQR";
+import SectionLoader from "@dine-desk/Common/Components/Loader/Spinner";
+import { PlusIcon } from "@heroicons/react/24/outline";
+import { motion } from "framer-motion";
 
 const Menu = () => {
   const {
@@ -19,32 +22,51 @@ const Menu = () => {
     openQRModal,
     setOpenQRModal,
     handleConfirmArchiveModal,
-    handleToggleModal,
     isMenuArchivePending,
     currentPage,
     setCurrentPage,
     totalRows,
   } = useMenuManagement();
 
+  if (isDataLoading) {
+    return <SectionLoader className="min-h-[60vh]" />;
+  }
+
   return (
-    <div>
-      <div className="my-4">
-        <Button
-          onClick={() => {
-            setSelectedMenu(null);
-            setOpenAddOrderModal(true);
-          }}
-          title="Add Menu"
-          variant="filled"
-          className="px-6 py-3 rounded-lg text-black cursor-pointer bg-blue-600"
-        />
-      </div>
-      <div className="w-full overflow-x-auto">
-        <div className="min-w-[300px]">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="flex justify-between items-center mb-8"
+        >
+          <Button
+            onClick={() => {
+              setSelectedMenu(null);
+              setOpenAddOrderModal(true);
+            }}
+            title="Add Menu"
+            variant="filled"
+            icon={<PlusIcon className="h-5 w-5 mr-2" />}
+            className="bg-yellow-600 hover:bg-yellow-700 text-white"
+          />
+        </motion.div>
+
+        {/* Table Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.3 }}
+        >
           <CustomTable
             data={data}
             columns={columns}
-            isLoading={isDataLoading}
+            isLoading={false}
             setCurrentPage={setCurrentPage}
             currentPage={
               typeof currentPage === "string"
@@ -56,11 +78,13 @@ const Menu = () => {
                 ? parseInt(totalRows, 10)
                 : totalRows
             }
+            className="border-0"
+            rowClassName="hover:bg-yellow-50"
+            headerClassName="bg-gray-50 text-gray-700 font-medium"
           />
-        </div>
-      </div>
+        </motion.div>
 
-      {openAddOrderModal && (
+        {/* Add/Edit Menu Modal */}
         <AddMenu
           onClose={() => {
             setOpenAddOrderModal(false);
@@ -70,9 +94,8 @@ const Menu = () => {
           isEdit={!!selectedMenu}
           id={selectedMenu?.id}
         />
-      )}
 
-      {openQRModal && (
+        {/* QR View Modal */}
         <ViewQR
           onClose={() => {
             setOpenQRModal(false);
@@ -81,32 +104,32 @@ const Menu = () => {
           open={openQRModal}
           id={selectedMenu?.id}
         />
-      )}
 
-      <ConfirmModal
-        width="sm"
-        isLoading={isMenuArchivePending}
-        open={openMenuArchiveConfirmationModal}
-        onConfirm={() => {
-          if (selectedMenu?.id !== undefined) {
-            handleConfirmArchiveModal(+selectedMenu?.id);
-          }
-        }}
-        showCancel
-        cancelButtonTitle="Cancel"
-        cancelButtonClassName="bg-white border border-gray-300 cursor-pointer"
-        titleClassName="text-gray-600"
-        onClose={() => {
-          setSelectedMenu(null);
-          handleToggleModal(setOpenMenuArchiveConfirmationModal);
-        }}
-        iconName={"archive"}
-        header="Are you sure?"
-        message={`Are you sure you want to delete this menu?`}
-        confirmButtonTitle={`Yes, Archive`}
-        buttonClassName={"bg-red-900 hover:bg-red-500 cursor-pointer"}
-      ></ConfirmModal>
-    </div>
+        {/* Archive Confirmation Modal */}
+        <ConfirmModal
+          width="md"
+          open={openMenuArchiveConfirmationModal}
+          onClose={() => {
+            setSelectedMenu(null);
+            setOpenMenuArchiveConfirmationModal(false);
+          }}
+          onConfirm={() => {
+            if (selectedMenu?.id !== undefined) {
+              handleConfirmArchiveModal(+selectedMenu?.id);
+            }
+          }}
+          showCancel
+          cancelButtonTitle="Cancel"
+          cancelButtonClassName="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+          isLoading={isMenuArchivePending}
+          header="Archive Menu"
+          message="This will remove the menu from active listings. You can restore it later if needed."
+          confirmButtonTitle="Archive"
+          buttonClassName="bg-red-600 hover:bg-red-700 text-white"
+          iconName="archive"
+        />
+      </div>
+    </motion.div>
   );
 };
 

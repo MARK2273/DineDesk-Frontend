@@ -4,8 +4,19 @@ import {
   useGetItemList,
   useUpdateItems,
 } from "@dine-desk/api/item";
-import { DndContext, closestCenter } from "@dnd-kit/core";
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
   useForm,
@@ -24,15 +35,16 @@ import Button from "@dine-desk/Common/Components/Button";
 import CheckboxField from "@dine-desk/Common/Components/FormField/CheckBoxField";
 import InputField from "@dine-desk/Common/Components/FormField/InputField";
 import { ROUTES } from "@dine-desk/constants/RoutePath";
-import { Skeleton } from "@dine-desk/Common/Components/Skeleton";
 import { dispatchToast } from "@dine-desk/helper/toastHelper";
 import { extractErrors } from "@dine-desk/helper";
 import SectionLoader from "@dine-desk/Common/Components/Loader/Spinner";
 import { storageHelper } from "@dine-desk/helper/storageHelper";
 import FileUpload from "@dine-desk/Common/Components/FormField/FileUpload";
+import clsx from "clsx";
+import { motion } from "framer-motion";
 
 type MenuItemType = {
-  available?: boolean | undefined;
+  available?: boolean;
   name: string;
   price: string;
   category: string;
@@ -43,27 +55,13 @@ type MenuItemType = {
 };
 
 type DraggableRowProps = {
-  field: FieldArrayWithId<
-    {
-      items?: MenuItemType[] | undefined;
-    },
-    "items",
-    "id"
-  >;
+  field: FieldArrayWithId<{ items?: MenuItemType[] }, "items", "id">;
   index: number;
-  register: UseFormRegister<{
-    items?: MenuItemType[] | undefined;
-  }>;
+  register: UseFormRegister<{ items?: MenuItemType[] }>;
   remove: UseFieldArrayRemove;
-  watch: UseFormWatch<{
-    items?: MenuItemType[] | undefined;
-  }>;
-  setValue: UseFormSetValue<{
-    items?: MenuItemType[] | undefined;
-  }>;
-  errors: FieldErrors<{
-    items?: MenuItemType[] | undefined;
-  }>;
+  watch: UseFormWatch<{ items?: MenuItemType[] }>;
+  setValue: UseFormSetValue<{ items?: MenuItemType[] }>;
+  errors: FieldErrors<{ items?: MenuItemType[] }>;
 };
 
 const AddEditItem = () => {
@@ -88,10 +86,18 @@ const AddEditItem = () => {
     name: "items",
   });
 
+  // Set up sensors for drag and drop
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   useEffect(() => {
     if (data?.data) {
       reset({
-        items: data?.data?.map((item: MenuItemType) => ({
+        items: data.data.map((item: MenuItemType) => ({
           ...item,
           price: item.price?.toString(),
         })),
@@ -103,7 +109,6 @@ const AddEditItem = () => {
   const onSubmit = async (data: ItamData) => {
     try {
       const formData = new FormData();
-
       const storage = storageHelper("session");
       const restaurantId = storage.getItem("restaurantId");
 
@@ -125,7 +130,7 @@ const AddEditItem = () => {
         );
         formData.append(`items[${index}][menuId]`, menuId || "");
 
-        if (item.image && item.image.length > 0) {
+        if (item.image?.length > 0) {
           item.image.forEach((fileOrUrl) => {
             if (typeof fileOrUrl === "string") {
               formData.append(`items[${index}][image]`, fileOrUrl);
@@ -138,10 +143,10 @@ const AddEditItem = () => {
 
       if (isEdit) {
         await updateItems(formData);
-        dispatchToast("success", "Item updated successfully");
+        dispatchToast("success", "Menu items updated successfully");
       } else {
         await createItems(formData);
-        dispatchToast("success", "Item created successfully");
+        dispatchToast("success", "Menu items created successfully");
       }
 
       navigate(ROUTES.MENU.path);
@@ -162,66 +167,107 @@ const AddEditItem = () => {
   };
 
   if (isLoading) {
-    return <SectionLoader />;
+    return <SectionLoader className="min-h-[60vh]" />;
   }
 
   return (
-    <div className="bg-white shadow-lg rounded-xl p-6 max-w-full mx-auto w-full">
-      <div className="flex flex-col sm:flex-row items-center justify-between border-b pb-4">
-        <Button
-          variant="filled"
-          onClick={() =>
-            append({
-              name: "",
-              price: "",
-              category: "",
-              description: "",
-              available: false,
-              image: [],
-            })
-          }
-          title="Add Item"
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white text-sm"
-        />
+    // <div className="">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="p-6 bg-gray-50 min-h-screen"
+    >
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+        <div className="flex space-x-3">
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.4 }}
+            className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4"
+          >
+            <Button
+              variant="outline"
+              onClick={() => navigate(ROUTES.MENU.path)}
+              className="border-gray-300"
+            >
+              Back to Menu
+            </Button>
+            <Button
+              variant="filled"
+              onClick={() =>
+                append({
+                  name: "",
+                  price: "",
+                  category: "",
+                  description: "",
+                  available: true,
+                  image: [],
+                })
+              }
+              className="bg-yellow-600 hover:bg-yellow-700"
+            >
+              Add Item
+            </Button>
+          </motion.div>
+        </div>
       </div>
-      <div className="mt-6">
-        {isLoading ? (
-          <div className="space-y-4">
-            <Skeleton className="h-16 w-full rounded-lg" count={3} />
-          </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.3 }}
+        className="space-y-4"
+      >
+        {fields.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center rounded-lg border border-gray-200 shadow-xs"
+          >
+            <div className="text-center py-8 bg-gray-50 rounded-lg">
+              <p className="text-gray-500">No items added yet</p>
+            </div>
+          </motion.div>
         ) : (
           <DndContext
+            sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
             <SortableContext items={fields.map((field) => field.id)}>
-              <div className="space-y-4">
-                {fields.map((field, index) => (
-                  <DraggableRow
-                    key={field.id}
-                    field={field}
-                    index={index}
-                    register={register}
-                    remove={remove}
-                    watch={watch}
-                    setValue={setValue}
-                    errors={errors}
-                  />
-                ))}
-              </div>
+              {fields.map((field, index) => (
+                <DraggableRow
+                  key={field.id}
+                  field={field}
+                  index={index}
+                  register={register}
+                  remove={remove}
+                  watch={watch}
+                  setValue={setValue}
+                  errors={errors}
+                />
+              ))}
             </SortableContext>
           </DndContext>
         )}
-        {/* Save Button */}
-        <Button
-          variant="filled"
-          title="Save"
-          onClick={handleSubmit(onSubmit)}
-          isLoading={isItemCreatePending || isItemUpdatePending}
-          className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg cursor-pointer"
-        />
-      </div>
-    </div>
+      </motion.div>
+
+      {fields.length > 0 && (
+        <div className="mt-8 flex justify-end">
+          <Button
+            variant="filled"
+            onClick={handleSubmit(onSubmit)}
+            isLoading={isItemCreatePending || isItemUpdatePending}
+            className="min-w-[200px] bg-yellow-600 hover:bg-yellow-700"
+            size="lg"
+          >
+            {isEdit ? "Update Items" : "Save Items"}
+          </Button>
+        </div>
+      )}
+    </motion.div>
+    // </div>
   );
 };
 
@@ -234,8 +280,14 @@ const DraggableRow = ({
   errors,
   field,
 }: DraggableRowProps) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: field.id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: field.id });
   const style = { transform: CSS.Transform.toString(transform), transition };
 
   const image = watch(`items.${index}.image`);
@@ -244,16 +296,29 @@ const DraggableRow = ({
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      className="flex flex-col sm:flex-row items-center gap-4 p-4 border rounded-lg bg-gray-50 shadow-md"
+      className={clsx(
+        "flex flex-col lg:flex-row gap-4 p-4 border rounded-lg bg-white",
+        "shadow-sm hover:shadow-md transition-shadow",
+        isDragging ? "shadow-lg border-yellow-400" : "border-gray-200"
+      )}
     >
-      <span
+      {/* Drag handle */}
+      <button
+        {...attributes}
         {...listeners}
-        className="text-lg font-bold cursor-grab"
-        style={{ touchAction: "none" }}
+        type="button"
+        className="flex items-center justify-center p-2 text-gray-400 hover:text-gray-600 cursor-grab"
+        aria-label="Drag to reorder"
       >
-        ☰
-      </span>
+        {/* <Icon name="dragHandle" className="w-5 h-5" /> */}
+        <span
+          {...listeners}
+          className="text-lg font-bold cursor-grab"
+          style={{ touchAction: "none" }}
+        >
+          ☰
+        </span>{" "}
+      </button>
       <CheckboxField
         id={`items.${index}.available`}
         label=""
@@ -265,50 +330,64 @@ const DraggableRow = ({
         }
         className="mt-1"
       />
-      <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 w-full">
-        <FileUpload
-          allowedFileTypes={["image/jpeg", "image/png"]}
-          value={image}
-          onChange={(files) =>
-            setValue(`items.${index}.image`, files, { shouldValidate: true })
-          }
-          error={errors?.items?.[index]?.image?.message}
-        />
-        <InputField
-          label="Name"
-          name={`items.${index}.name`}
-          register={register}
-          error={errors?.items?.[index]?.name?.message}
-          placeholder="Enter Name"
-        />
-        <InputField
-          label="Price"
-          name={`items.${index}.price`}
-          register={register}
-          error={errors?.items?.[index]?.price?.message}
-          placeholder="Enter Price"
-        />
-        <InputField
-          label="Category"
-          name={`items.${index}.category`}
-          register={register}
-          error={errors?.items?.[index]?.category?.message}
-          placeholder="Enter Category"
-        />
-        <InputField
-          label="Description"
-          name={`items.${index}.description`}
-          register={register}
-          error={errors?.items?.[index]?.description?.message}
-          placeholder="Enter Description"
-        />
+
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-4">
+        {/* Image upload */}
+        <div className="md:col-span-2">
+          <FileUpload
+            allowedFileTypes={["image/jpeg", "image/png"]}
+            value={image}
+            onChange={(files) =>
+              setValue(`items.${index}.image`, files, { shouldValidate: true })
+            }
+            error={errors?.items?.[index]?.image?.message}
+          />
+        </div>
+
+        {/* Form fields */}
+        <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <InputField
+            label="Name"
+            name={`items.${index}.name`}
+            register={register}
+            error={errors?.items?.[index]?.name?.message}
+            placeholder="Item name"
+          />
+          <InputField
+            label="Price"
+            name={`items.${index}.price`}
+            register={register}
+            error={errors?.items?.[index]?.price?.message}
+            placeholder="0.00"
+            type="number"
+          />
+          <InputField
+            label="Category"
+            name={`items.${index}.category`}
+            register={register}
+            error={errors?.items?.[index]?.category?.message}
+            placeholder="Category"
+          />
+          <InputField
+            label="Description"
+            name={`items.${index}.description`}
+            register={register}
+            error={errors?.items?.[index]?.description?.message}
+            placeholder="Description"
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="md:col-span-2 flex flex-col sm:flex-row lg:flex-col items-center justify-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => remove(index)}
+            className="text-red-600 border-red-200 hover:bg-red-50 w-full"
+          >
+            Remove
+          </Button>
+        </div>
       </div>
-      <Button
-        variant="filled"
-        title="Remove"
-        onClick={() => remove(index)}
-        className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm"
-      />
     </div>
   );
 };

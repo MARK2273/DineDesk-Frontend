@@ -29,7 +29,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onConfirm,
   children,
   confirmButtonTitle = "Confirm",
-  cancelButtonTitle = "Confirm",
+  cancelButtonTitle = "Cancel",
   buttonClassName,
   cancelButtonClassName,
   titleClassName,
