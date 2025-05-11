@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-object-type */
 import cx from "clsx";
 import { ReactNode } from "react";
 
@@ -10,22 +9,22 @@ export const Button = ({
   icon = false,
   iconFirst = false,
   variant,
-  size,
+  size = "md",
   borderSize = "sm",
   onClick,
-  active = false,
+  // active = false,
   isSquare = false,
   titleClassName,
   type,
   disabled,
   isLoading = false,
-  rounded,
+  rounded = "md",
   text = "white",
   hoverText = "white",
-  bg = "Primary-500",
-  hoverBg = "dark",
-  border = "primary",
-  hoverBorder = "dark",
+  bg = "yellow-500",
+  hoverBg = "yellow-600",
+  border = "yellow-500",
+  hoverBorder = "yellow-600",
   children,
   buttonRef,
 }: {
@@ -40,7 +39,6 @@ export const Button = ({
   title?: string;
   icon?: ReactNode;
   iconFirst?: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onClick?: any;
   active?: boolean;
   isSquare?: boolean;
@@ -55,59 +53,125 @@ export const Button = ({
   text?: string;
   hoverText?: string;
   bg?: string;
-  dataCopy?: string;
   hoverBg?: string;
   border?: string;
   hoverBorder?: string;
   children?: ReactNode;
   buttonRef?: React.LegacyRef<HTMLButtonElement> | undefined;
 }) => {
-  const classes = cx(
-    className,
-    `group font-bold outline-none inline-flex items-center  justify-center  transit leading-none rounded transition-all ${
-      size === "xs" ? "text-xs gap-1" : "text-sm gap-1.5"
-    }`,
-    { "select-none": active || isLoading },
-    { [`rounded-${rounded}`]: rounded },
-    { rounded: !rounded },
-    { "aspect-square": isSquare },
-    { "h-6 px-1.5": size === "xs" },
-    { "h-9 px-3": size === "sm" },
-    { "h-10 px-4": size === "md" },
-    { "h-11 px-5": size === "lg" },
+  const baseClasses = cx(
+    "group font-medium outline-none inline-flex items-center justify-center transition-all",
+    "focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50",
+    "active:scale-[0.98] transition-transform duration-75",
     {
-      [`bg-${bg} hover:bg-${hoverBg} text-${text} hover:text-${hoverText} `]:
+      "select-none cursor-not-allowed": disabled || isLoading,
+      "cursor-pointer": !disabled && !isLoading,
+    }
+  );
+
+  const sizeClasses = cx(
+    {
+      "text-xs px-2 h-6 gap-1": size === "xs",
+      "text-sm px-3 h-8 gap-1.5": size === "sm",
+      "text-base px-4 h-10 gap-2": size === "md",
+      "text-lg px-5 h-12 gap-2.5": size === "lg",
+    },
+    {
+      "aspect-square": isSquare,
+      "px-2": isSquare && size === "xs",
+      "px-3": isSquare && size === "sm",
+      "px-4": isSquare && size === "md",
+      "px-5": isSquare && size === "lg",
+    }
+  );
+
+  const roundedClasses = cx({
+    "rounded-xs": rounded === "xs",
+    "rounded-sm": rounded === "sm",
+    "rounded-md": rounded === "md",
+    "rounded-lg": rounded === "lg",
+    "rounded-full": rounded === "full",
+  });
+
+  const variantClasses = cx(
+    {
+      [`bg-${bg} text-${text} hover:bg-${hoverBg} hover:text-${hoverText}`]:
         variant === "filled",
+      [`border ${
+        borderSize === "md" ? "border-2" : "border"
+      } border-${border} text-${border} hover:border-${hoverBorder} hover:text-${hoverBorder} bg-transparent`]:
+        variant === "outline",
+      "bg-transparent": variant === "none",
     },
     {
-      [` ${
-        borderSize === "md" ? "border-2" : "border"
-      } border-${border} hover:border-${hoverBorder} bg-${bg} hover:bg-${hoverBg} text-${text} hover:text-${hoverText} `]:
-        variant === "outline",
-    },
-    { "opacity-50 cursor-not-allowed": disabled || isLoading }
+      "opacity-70": disabled,
+      "hover:shadow-md": !disabled && variant !== "none",
+    }
+  );
+
+  const loadingSpinner = (
+    <span className="relative flex items-center justify-center">
+      <span className="absolute h-4 w-4 border-2 border-current border-b-transparent rounded-full animate-spin" />
+    </span>
+  );
+
+  const iconContent = icon && (
+    <span
+      className={cx(
+        "flex items-center justify-center",
+        {
+          "text-lg": size === "md" || size === "lg",
+          "text-base": size === "sm",
+          "text-sm": size === "xs",
+        },
+        isLoading ? "" : "visible"
+      )}
+    >
+      {icon}
+    </span>
+  );
+
+  const titleContent = title && (
+    <span
+      className={cx(
+        titleClassName,
+        isLoading ? "" : "visible",
+        "whitespace-nowrap"
+      )}
+    >
+      {title}
+    </span>
+  );
+
+  const classes = cx(
+    baseClasses,
+    sizeClasses,
+    roundedClasses,
+    variantClasses,
+    className
   );
 
   return isLink && href ? (
-    // eslint-disable-next-line react/jsx-no-useless-fragment
     <></>
   ) : (
     <button
       onClick={onClick}
       type={type}
-      // data-copy={dataCopy}
       className={classes}
       ref={buttonRef}
-      disabled={disabled}
+      disabled={disabled || isLoading}
     >
       {children && children}
+      {iconFirst && iconContent}
       {isLoading ? (
-        <span className="relative h-4 w-4 border-[3px] border-gray-900 border-b-white rounded-full block animate-spin" />
-      ) : iconFirst && icon ? (
-        <span className="">{icon}</span>
-      ) : null}
-      {title && <span className={titleClassName}>{title}</span>}
-      {!iconFirst && icon ? <span className="text-lg">{icon}</span> : null}
+        <span className="flex items-center gap-5">
+          {titleContent}
+          {loadingSpinner}
+        </span>
+      ) : (
+        titleContent
+      )}
+      {!iconFirst && iconContent}
     </button>
   );
 };

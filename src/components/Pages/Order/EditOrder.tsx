@@ -6,12 +6,11 @@ import SectionLoader from "@dine-desk/Common/Components/Loader/Spinner";
 import NotFound from "@dine-desk/Common/Components/NotFound";
 import { ROUTES } from "@dine-desk/constants/RoutePath";
 import { dispatchToast } from "@dine-desk/helper/toastHelper";
-import { extractErrors, getStatusColor, OrderStatus } from "@dine-desk/helper";
+import { extractErrors, OrderStatus } from "@dine-desk/helper";
 import Button from "@dine-desk/Common/Components/Button";
 import clsx from "clsx";
-import CustomSelect, {
-  OptionType,
-} from "@dine-desk/Common/Components/FormField/CustomSelect";
+import CustomSelect from "@dine-desk/Common/Components/FormField/CustomSelect";
+import { OptionType } from "@dine-desk/Common/Components/FormField/CustomSelect";
 import { MultiValue, SingleValue } from "react-select";
 
 export const statusOptions = Object.values(OrderStatus).map((status) => ({
@@ -19,13 +18,13 @@ export const statusOptions = Object.values(OrderStatus).map((status) => ({
   label: status.charAt(0).toUpperCase() + status.slice(1),
 }));
 
-// TYPES
 interface MenuItem {
   id: number;
   name: string;
   price: number;
   available: boolean;
   image: string[];
+  description?: string;
 }
 
 interface SelectedItem {
@@ -33,6 +32,7 @@ interface SelectedItem {
   itemName: string;
   price: number;
   quantity: number;
+  notes?: string;
 }
 
 const EditOrder = () => {
@@ -41,10 +41,11 @@ const EditOrder = () => {
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [orderStatus, setOrderStatus] = useState<OptionType>(statusOptions[0]);
+  const [itemNotes, setItemNotes] = useState<Record<number, string>>({});
   const { mutateAsync: updateOrder, isPending: isUpdateOrderPending } =
     useUpdateOrder();
 
-  if (!orderId) return <NotFound path="/" />;
+  if (!orderId) return <NotFound path={ROUTES.ORDER.path} />;
 
   const {
     data: orderData,
@@ -67,6 +68,15 @@ const EditOrder = () => {
         statusOptions.find((option) => option.value === orderData.status) ||
         statusOptions[0];
       setOrderStatus(initialStatus);
+
+      // Initialize notes
+      const notes: Record<number, string> = {};
+      orderData.items?.forEach((item: any) => {
+        if (item.notes) {
+          notes[item.id] = item.notes;
+        }
+      });
+      setItemNotes(notes);
     }
   }, [orderData]);
 
@@ -90,6 +100,7 @@ const EditOrder = () => {
             itemName: "name" in item ? item.name : item.itemName,
             price: item.price,
             quantity: 1,
+            notes: itemNotes[item.id] || "",
           },
         ];
       } else if (existingItem) {
@@ -103,6 +114,13 @@ const EditOrder = () => {
     });
   };
 
+  const updateItemNotes = (id: number, notes: string) => {
+    setItemNotes((prev) => ({ ...prev, [id]: notes }));
+    setSelectedItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, notes } : item))
+    );
+  };
+
   const removeItem = (id: number) => {
     setSelectedItems((prev) => prev.filter((item) => item.id !== id));
   };
@@ -110,6 +128,10 @@ const EditOrder = () => {
   const getItemQuantity = (id: number): number => {
     return selectedItems.find((i) => i.id === id)?.quantity || 0;
   };
+
+  // const handleStatusChange = (newValue: OptionType) => {
+  //   setOrderStatus(newValue);
+  // };
 
   const handleStatusChange = (
     newValue: MultiValue<OptionType> | SingleValue<OptionType>
@@ -124,10 +146,15 @@ const EditOrder = () => {
       const payload = {
         orderId: orderData?.orderId,
         status: orderStatus.value,
-        items: selectedItems,
+        items: selectedItems.map((item) => ({
+          id: item.id,
+          itemName: item.itemName,
+          price: item.price,
+          quantity: item.quantity,
+          notes: item.notes || "",
+        })),
       };
 
-      console.log("Submit payload:", payload);
       await updateOrder(payload);
       dispatchToast("success", "Order updated successfully");
       navigate(ROUTES.ORDER.path);
@@ -137,49 +164,130 @@ const EditOrder = () => {
     }
   };
 
-  if (isOrderLoading || isMenuLoading) return <SectionLoader />;
-  if (isOrderError || isMenuError)
-    return (
-      <div className="text-red-500 text-center p-4">Error loading data</div>
-    );
+  if (isOrderLoading || isMenuLoading)
+    return <SectionLoader className="min-h-[60vh]" />;
+  if (isOrderError || isMenuError) return <NotFound path={ROUTES.ORDER.path} />;
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-6xl">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <h2 className="text-2xl font-bold text-gray-800">
-          Order Id #{orderData?.orderId}
-        </h2>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Edit Order #{orderData?.orderId}
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Customer: {orderData?.customerName || "Walk-in"}
+          </p>
+        </div>
 
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <div
-            className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-              orderStatus.value as OrderStatus
-            )}`}
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={() => navigate(ROUTES.ORDER.path)}
+            className="border-gray-300"
           >
-            {orderStatus.value.toUpperCase()}
-          </div>
+            Back to Orders
+          </Button>
 
-          <CustomSelect
-            options={statusOptions}
-            value={orderStatus}
-            onChange={handleStatusChange}
-            placeholder="Select Status"
-            isClearable={false}
-            isDisabled={false}
-          />
+          <div className="w-40">
+            {/* <CustomSelect
+              options={statusOptions}
+              value={orderStatus}
+              onChange={handleStatusChange}
+              isClearable={false}
+            /> */}
+            <CustomSelect
+              options={statusOptions}
+              value={orderStatus}
+              onChange={handleStatusChange}
+              placeholder="Select Status"
+              isClearable={false}
+              isDisabled={false}
+            />
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Selected Items Section */}
+        {/* Menu Items Section */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="text-lg font-semibold text-gray-700 mb-3">
-              Selected Items
-            </h3>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Menu Items
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {menuItemsData?.data
+                ?.filter((item: MenuItem) => item.available)
+                .map((item: MenuItem) => {
+                  const quantity = getItemQuantity(item.id);
+                  return (
+                    <div
+                      key={item.id}
+                      className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition"
+                    >
+                      <div className="relative aspect-square">
+                        <img
+                          src={item.image[0] || "/placeholder-food.jpg"}
+                          alt={item.name}
+                          className="absolute h-full w-full object-cover"
+                        />
+                      </div>
+                      <div className="p-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-medium text-gray-900">
+                              {item.name}
+                            </h3>
+                            <p className="text-sm text-gray-600">
+                              ₹{item.price.toFixed(2)}
+                            </p>
+                          </div>
+                          {quantity > 0 && (
+                            <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">
+                              {quantity} in order
+                            </span>
+                          )}
+                        </div>
+                        {item.description && (
+                          <p className="text-xs text-gray-500 mt-1 truncate">
+                            {item.description}
+                          </p>
+                        )}
+                        <div className="mt-3 flex justify-between items-center">
+                          <Button
+                            variant={quantity > 0 ? "outline" : "filled"}
+                            size="sm"
+                            onClick={() => updateQuantity(item, 1)}
+                            className={clsx("w-full", {
+                              "bg-yellow-600 hover:bg-yellow-700 text-white":
+                                quantity === 0,
+                              "border-yellow-500 text-yellow-600": quantity > 0,
+                            })}
+                          >
+                            {quantity > 0 ? "Add More" : "Add to Order"}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        </div>
+
+        {/* Order Summary Section */}
+        <div className="lg:col-span-1 space-y-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Order Summary
+            </h2>
 
             {selectedItems.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8">
+                {/* <Icon
+                  name="shoppingCart"
+                  className="mx-auto h-12 w-12 text-gray-400"
+                /> */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-12 w-12 mx-auto text-gray-400"
@@ -194,185 +302,89 @@ const EditOrder = () => {
                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                   />
                 </svg>
-                <p className="mt-2">No items selected</p>
-                <p className="text-sm">Add items from the menu below</p>
+                <p className="mt-2 text-gray-500">No items in order</p>
+                <p className="text-sm text-gray-400">Add items from the menu</p>
               </div>
             ) : (
-              <ul className="divide-y divide-gray-200">
-                {selectedItems.map((item) => (
-                  <li key={item.id} className="py-3">
-                    <div className="flex justify-between">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {item.itemName}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          ₹{item.price.toFixed(2)}
-                        </p>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <Button
-                          variant="filled"
-                          className="w-8 h-8 rounded-full bg-blue-100 text-gray-600 flex items-center justify-center hover:bg-blue-200 transition cursor-pointer"
-                          titleClassName="text-gray-600"
-                          onClick={() => updateQuantity(item, -1)}
-                          title="-"
-                        />
-                        <span className="w-8 text-center">{item.quantity}</span>
-                        <Button
-                          variant="filled"
-                          className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition cursor-pointer"
-                          titleClassName="text-blue-600"
-                          onClick={() => updateQuantity(item, 1)}
-                          title="+"
-                        />
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          className="text-red-500 hover:text-red-700 transition"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          {/* Menu Items Section */}
-          <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="text-lg font-semibold text-gray-700 mb-3">
-              Available Menu Items
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {menuItemsData?.data
-                ?.filter((item: MenuItem) => item.available)
-                .map((item: MenuItem) => {
-                  const quantity = getItemQuantity(item.id);
-                  return (
+              <>
+                <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+                  {selectedItems.map((item) => (
                     <div
                       key={item.id}
-                      className="border border-gray-100 rounded-lg overflow-hidden hover:shadow-md transition"
+                      className="border-b border-gray-100 pb-3 last:border-0"
                     >
-                      <div className="relative pb-3/4 h-32">
-                        <img
-                          src={item.image[0]}
-                          alt={item.name}
-                          className="absolute h-full w-full object-cover"
-                        />
-                      </div>
-                      <div className="p-2">
-                        <h4 className="font-medium text-gray-900 truncate">
-                          {item.name}
-                        </h4>
-                        <p className="text-sm text-gray-600">
-                          ₹{item.price.toFixed(2)}
-                        </p>
-                        {quantity === 0 ? (
+                      <div className="flex justify-between">
+                        <div>
+                          <p className="font-medium text-gray-800">
+                            {item.itemName}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            ₹{item.price.toFixed(2)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
                           <Button
-                            variant="filled"
-                            className="mt-2 w-full py-1 bg-blue-600 rounded hover:bg-blue-700 transition"
-                            titleClassName="text-white text-sm"
-                            onClick={() => updateQuantity(item, 1)}
-                            title="Add"
+                            variant="none"
+                            size="sm"
+                            onClick={() => updateQuantity(item, -1)}
+                            className="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center hover:bg-yellow-200 transition cursor-pointer"
+                            title="-"
                           />
-                        ) : (
-                          <div className="flex items-center justify-between mt-2">
-                            <Button
-                              variant="filled"
-                              className="w-7 h-7 rounded bg-blue-100 cursor-pointer flex items-center justify-center hover:bg-blue-200 transition"
-                              titleClassName="text-gray-600"
-                              onClick={() => updateQuantity(item, -1)}
-                              title="-"
-                            />
-                            <span className="text-sm font-medium">
-                              {quantity}
-                            </span>
-                            <Button
-                              variant="filled"
-                              className="w-7 h-7 rounded bg-blue-100 cursor-pointer flex items-center justify-center hover:bg-blue-200 transition"
-                              titleClassName="text-blue-600"
-                              onClick={() => updateQuantity(item, 1)}
-                              title="+"
-                            />
-                          </div>
-                        )}
+                          <span className="w-6 text-center">
+                            {item.quantity}
+                          </span>
+                          <Button
+                            variant="none"
+                            size="sm"
+                            onClick={() => updateQuantity(item, 1)}
+                            title="+"
+                            className="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center hover:bg-yellow-200 transition cursor-pointer"
+                          />
+                        </div>
                       </div>
+
+                      {/* <div className="mt-2">
+                        <input
+                          type="text"
+                          value={itemNotes[item.id] || ""}
+                          onChange={(e) =>
+                            updateItemNotes(item.id, e.target.value)
+                          }
+                          placeholder="Add notes (e.g., no onions)"
+                          className="w-full text-sm border border-gray-200 rounded px-2 py-1 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
+                        />
+                      </div> */}
                     </div>
-                  );
-                })}
-            </div>
-          </div>
-        </div>
-
-        {/* Order Summary Section */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow p-4 sticky top-4">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">
-              Order Summary
-            </h3>
-
-            <div className="space-y-3 mb-4">
-              {selectedItems.map((item) => (
-                <div key={item.id} className="flex justify-between text-sm">
-                  <span>
-                    {item.itemName} × {item.quantity}
-                  </span>
-                  <span>₹{(item.price * item.quantity).toFixed(2)}</span>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            <div className="border-t border-gray-200 pt-3">
-              <div className="flex justify-between font-medium text-gray-900">
-                <span>Total</span>
-                <span>₹{totalPrice.toFixed(2)}</span>
-              </div>
-            </div>
+                <div className="border-t border-gray-200 mt-4 pt-4">
+                  {/* <div className="flex justify-between font-medium text-gray-900">
+                    <span>Subtotal</span>
+                    <span>₹{totalPrice.toFixed(2)}</span>
+                  </div> */}
+                  {/* <div className="flex justify-between text-sm text-gray-500 mt-1">
+                    <span>Tax</span>
+                    <span>₹{(totalPrice * 0.05).toFixed(2)}</span>
+                  </div> */}
+                  <div className="flex justify-between font-bold text-lg mt-3">
+                    <span>Total</span>
+                    <span>₹{totalPrice.toFixed(2)}</span>
+                    {/* <span>₹{(totalPrice * 1.05).toFixed(2)}</span> */}
+                  </div>
+                </div>
 
-            <div className="mt-4 flex items-center justify-between">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Order Status
-              </label>
-              <div
-                className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                  orderStatus.value as OrderStatus
-                )}`}
-              >
-                {orderStatus.value.toUpperCase()}
-              </div>
-            </div>
-
-            <Button
-              variant="filled"
-              className={clsx(
-                "mt-6 w-full !py-2 px-4 rounded-md font-medium transition cursor-pointer",
-                {
-                  "bg-gray-300 text-gray-500 !cursor-not-allowed":
-                    selectedItems.length === 0,
-                  "bg-green-600 text-white hover:bg-green-700":
-                    selectedItems.length > 0,
-                }
-              )}
-              title="Update Order"
-              disabled={selectedItems.length === 0 || isUpdateOrderPending}
-              isLoading={isUpdateOrderPending}
-              onClick={handleSubmit}
-            />
+                <Button
+                  variant="filled"
+                  className="w-full mt-6 bg-yellow-600 hover:bg-yellow-700"
+                  size="lg"
+                  onClick={handleSubmit}
+                  isLoading={isUpdateOrderPending}
+                >
+                  Update Order
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>

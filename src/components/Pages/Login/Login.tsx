@@ -137,11 +137,6 @@ const Login = () => {
       <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 bg-white shadow-xl rounded-2xl overflow-hidden">
         {/* Left Side: Branding / Illustration */}
         <div className="hidden md:flex flex-col items-center justify-center bg-yellow-100 p-8">
-          <img
-            src="/restaurant-icon.svg"
-            alt="Restaurant Icon"
-            className="w-40 mb-6"
-          />
           <h2 className="text-3xl font-bold text-gray-700 text-center">
             Welcome to Dine Desk
           </h2>

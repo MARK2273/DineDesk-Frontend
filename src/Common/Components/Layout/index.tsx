@@ -6,7 +6,7 @@ import Header from "./Header";
 type AppLayoutProps = PropsWithChildren;
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1200);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1024);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -14,7 +14,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsSidebarOpen(window.innerWidth >= 1200);
+      setIsSidebarOpen(window.innerWidth >= 1024);
     };
 
     window.addEventListener("resize", handleResize);
@@ -22,8 +22,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }, []);
 
   return (
-    <div className="flex bg-Gray-300 h-screen overflow-hidden">
+    <div className="flex h-screen bg-gray-50">
       <Sidebar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+
       <div
         className={clsx(
           "relative flex flex-col h-full transition-all duration-300 ease-in-out",
@@ -35,9 +36,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <div className="flex-shrink-0 z-10 bg-white shadow-md">
           <Header />
         </div>
-        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4">
-          {children}
-        </div>
+        <main className="flex-1 p-4 md:p-6 overflow-y-auto bg-gradient-to-br from-yellow-50/20 via-white to-yellow-100/20">
+          <div className="max-w-7xl mx-auto">{children}</div>
+        </main>
       </div>
     </div>
   );

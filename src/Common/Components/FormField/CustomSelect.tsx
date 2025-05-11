@@ -1,5 +1,6 @@
 import React from "react";
 import Select, { ActionMeta, MultiValue, SingleValue } from "react-select";
+import clsx from "clsx";
 
 export interface OptionType {
   value: string;
@@ -18,6 +19,8 @@ interface CustomSelectProps {
   isClearable?: boolean;
   isDisabled?: boolean;
   className?: string;
+  menuPlacement?: "auto" | "bottom" | "top";
+  isLoading?: boolean;
 }
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
@@ -29,67 +32,106 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   isClearable = true,
   isDisabled = false,
   className = "",
+  menuPlacement = "auto",
+  isLoading = false,
 }) => {
   const customStyles = {
     control: (provided: any, state: any) => ({
       ...provided,
-      backgroundColor: "#f0f8ff",
+      backgroundColor: state.isDisabled ? "#f3f4f6" : "white",
+      minHeight: "44px",
       borderRadius: "8px",
-      borderColor: state.isFocused ? "#007bff" : "#87ceeb",
-      boxShadow: state.isFocused ? "0 0 5px rgba(0, 123, 255, 0.5)" : "none",
-      padding: "4px",
+      borderColor: state.isFocused ? "#f59e0b" : "#e5e7eb",
+      boxShadow: state.isFocused ? "0 0 0 1px #f59e0b" : "none",
+      padding: "0 8px",
       transition: "all 0.2s ease",
-      width: "100%",
-      minWidth: "200px",
-      maxWidth: "400px",
-      "@media (max-width: 600px)": {
-        minWidth: "100px",
-      },
       "&:hover": {
-        borderColor: "#007bff",
+        borderColor: state.isFocused ? "#f59e0b" : "#d1d5db",
       },
     }),
     menu: (provided: any) => ({
       ...provided,
-      backgroundColor: "#f0f8ff",
       borderRadius: "8px",
-      boxShadow: "0px 4px 6px rgba(0, 0, 139, 0.1)",
-      width: "100%",
-      minWidth: "200px",
-      maxWidth: "400px",
-      "@media (max-width: 600px)": {
-        minWidth: "100px",
-      },
+      boxShadow:
+        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+      marginTop: "4px",
+      zIndex: 10,
     }),
     option: (provided: any, state: any) => ({
       ...provided,
       backgroundColor: state.isSelected
-        ? "#007bff"
+        ? "#fef3c7"
         : state.isFocused
-        ? "#cce5ff"
-        : "#f0f8ff",
-      color: state.isSelected ? "#fff" : "#333",
-      padding: "10px 15px",
+        ? "#fffbeb"
+        : "white",
+      color: state.isSelected ? "#92400e" : "#1f2937",
+      padding: "10px 16px",
       cursor: "pointer",
+      fontSize: "14px",
+      "&:active": {
+        backgroundColor: "#fef3c7",
+      },
+    }),
+    multiValue: (provided: any) => ({
+      ...provided,
+      backgroundColor: "#fef3c7",
+      borderRadius: "6px",
+    }),
+    multiValueLabel: (provided: any) => ({
+      ...provided,
+      color: "#92400e",
+      fontWeight: "500",
+    }),
+    multiValueRemove: (provided: any) => ({
+      ...provided,
+      color: "#92400e",
+      ":hover": {
+        backgroundColor: "#fde68a",
+        color: "#92400e",
+      },
+    }),
+    indicatorSeparator: () => ({
+      display: "none",
+    }),
+    dropdownIndicator: (provided: any, state: any) => ({
+      ...provided,
+      color: "#6b7280",
       transition: "all 0.2s ease",
-      "&:hover": {
-        backgroundColor: "#cce5ff",
+      transform: state.selectProps.menuIsOpen ? "rotate(180deg)" : null,
+    }),
+    clearIndicator: (provided: any) => ({
+      ...provided,
+      color: "#6b7280",
+      ":hover": {
+        color: "#92400e",
       },
     }),
   };
 
   return (
-    <Select
-      options={options}
-      value={value}
-      onChange={(newValue, actionMeta) => onChange(newValue, actionMeta)}
-      isMulti={isMulti}
-      placeholder={placeholder}
-      isClearable={isClearable}
-      isDisabled={isDisabled}
-      styles={customStyles}
-      className={className}
-    />
+    <div className={clsx("w-full", className)}>
+      <Select
+        options={options}
+        value={value}
+        onChange={onChange}
+        isMulti={isMulti}
+        placeholder={placeholder}
+        isClearable={isClearable}
+        isDisabled={isDisabled}
+        isLoading={isLoading}
+        styles={customStyles}
+        menuPlacement={menuPlacement}
+        classNamePrefix="react-select"
+        className="react-select-container"
+        components={{
+          LoadingIndicator: () => (
+            <div className="px-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-500" />
+            </div>
+          ),
+        }}
+      />
+    </div>
   );
 };
 

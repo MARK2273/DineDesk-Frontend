@@ -43,7 +43,7 @@ export const Modal: React.FC<ModalProps> = ({
     <div
       id={id}
       className={clsx(
-        "fixed inset-0  bg-opacity-50 z-50 flex items-center justify-center",
+        "fixed inset-0  bg-opacity-50 z-50 flex items-center justify-center backdrop-blur-sm transition-opacity",
         ParentClassName
       )}
     >

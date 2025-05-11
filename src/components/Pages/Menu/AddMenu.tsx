@@ -17,6 +17,7 @@ interface AddEditMenuModalProps {
   isEdit?: boolean;
   id?: string;
 }
+
 const AddEditMenu: React.FC<AddEditMenuModalProps> = ({
   open,
   onClose,
@@ -28,33 +29,37 @@ const AddEditMenu: React.FC<AddEditMenuModalProps> = ({
     useUpdateMenu(id);
   const { mutateAsync: createMenu, isPending: isCreateMenuPending } =
     useCreateMenu();
-  const initialValues = data ? { ...data } : {};
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
   } = useForm<MenuData>({
     resolver: yupResolver(menuSchema),
-    defaultValues: initialValues,
+    defaultValues: data || { name: "" },
   });
 
-  useEffect(() => reset(initialValues), [dataUpdatedAt]);
+  useEffect(() => {
+    if (data) {
+      reset(data);
+    }
+  }, [dataUpdatedAt]);
 
-  const onSubmit = async (data: MenuData) => {
+  const onSubmit = async (formData: MenuData) => {
     try {
       const storage = storageHelper("session");
       const restaurantId = storage.getItem("restaurantId");
 
       if (isEdit) {
-        await updateMenu(data);
+        await updateMenu(formData);
         dispatchToast("success", "Menu updated successfully");
       } else {
         if (!restaurantId) {
           dispatchToast("error", "Please select a restaurant");
           return;
         }
-        await createMenu({ ...data, restaurantId });
+        await createMenu({ ...formData, restaurantId });
         dispatchToast("success", "Menu created successfully");
       }
       reset();
@@ -66,46 +71,51 @@ const AddEditMenu: React.FC<AddEditMenuModalProps> = ({
   };
 
   if (isLoading) {
-    return <SectionLoader />;
+    return (
+      <div className="flex items-center justify-center min-h-[200px]">
+        <SectionLoader />
+      </div>
+    );
   }
+
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={isEdit ? "Edit Menu" : "Add Menu"}
-      width="sm"
-      ParentClassName="!bg-opacity-50"
-      TitleClassname="!text-Gray-900"
-      footer={
-        <div className="flex items-center justify-end gap-2.5 mt-10px">
+      title={isEdit ? "Edit Menu" : "Create New Menu"}
+      width="md"
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <InputField
+          label="Menu Name"
+          name="name"
+          error={errors?.name?.message}
+          register={register}
+          placeholder="Enter menu name"
+          inputClass="w-full"
+        />
+
+        <div className="flex justify-end space-x-3 pt-4">
           <Button
-            variant="filled"
-            title="Cancel"
-            className="px-6 py-3 rounded-lg !bg-blue-100 border border-solid !border-blue-500 !text-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
+            variant="outline"
+            type="button"
             onClick={onClose}
             disabled={isCreateMenuPending || isUpdateMenuPending}
-          />
+            className="min-w-[100px]"
+          >
+            Cancel
+          </Button>
           <Button
             variant="filled"
-            title={isEdit ? "Update" : "Save"}
-            onClick={handleSubmit(onSubmit)}
-            className="px-6 py-3 rounded-lg !bg-blue-100 border border-solid !border-blue-500 !text-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
+            type="submit"
             isLoading={isCreateMenuPending || isUpdateMenuPending}
-          />
+            disabled={!isDirty || isCreateMenuPending || isUpdateMenuPending}
+            className="min-w-[100px] bg-yellow-600 hover:bg-yellow-700"
+          >
+            {isEdit ? "Update" : "Create"}
+          </Button>
         </div>
-      }
-    >
-      <div className="flex items-center justify-center">
-        <div className="w-full max-w-md bg-white ">
-          <InputField
-            label="Menu Name"
-            name="name"
-            error={errors?.name?.message}
-            register={register}
-            inputClass="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-          />
-        </div>
-      </div>
+      </form>
     </Modal>
   );
 };

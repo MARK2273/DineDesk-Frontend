@@ -28,6 +28,8 @@ import Logout from "../../../assets/svg/Logout.svg?react";
 import Pdf from "../../../assets/svg/Pdf.svg?react";
 import ChooseImage from "../../../assets/svg/ChooseImage.svg?react";
 import Files from "../../../assets/svg/Files.svg?react";
+import Revenue from "../../../assets/svg/Revenue.svg?react";
+import ShopingBag from "../../../assets/svg/ShopingBag.svg?react";
 import Image from "../Image";
 import SectionLoader from "../Loader/Spinner";
 
@@ -57,6 +59,8 @@ export type IconNameType =
   | "pdf"
   | "chooseImage"
   | "files"
+  | "revenue"
+  | "shopingBag"
   | "logout";
 
 type IconProps = {
@@ -145,6 +149,10 @@ const Icon = ({
         return <ChooseImage {...iconProps} />;
       case "files":
         return <Files {...iconProps} />;
+      case "revenue":
+        return <Revenue {...iconProps} />;
+      case "shopingBag":
+        return <ShopingBag {...iconProps} />;
       default:
         return <></>;
     }

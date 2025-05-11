@@ -21,6 +21,7 @@ interface AddEditRestaurantModalProps {
   isEdit?: boolean;
   id?: string;
 }
+
 const AddEditRestaurant: React.FC<AddEditRestaurantModalProps> = ({
   onClose,
   open,
@@ -29,10 +30,11 @@ const AddEditRestaurant: React.FC<AddEditRestaurantModalProps> = ({
 }) => {
   const { data, dataUpdatedAt, isLoading } = useGetRestaurant(id);
   const initialValues = data ? { ...data } : {};
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     watch,
     reset,
     setValue,
@@ -40,6 +42,7 @@ const AddEditRestaurant: React.FC<AddEditRestaurantModalProps> = ({
     resolver: yupResolver(restaurantSchema),
     defaultValues: initialValues,
   });
+
   const image = watch("image");
 
   useEffect(() => reset(initialValues), [dataUpdatedAt]);
@@ -48,6 +51,7 @@ const AddEditRestaurant: React.FC<AddEditRestaurantModalProps> = ({
     mutateAsync: updateRestaurant,
     isPending: isUpdateRestaurantPending,
   } = useUpdateRestaurant(id);
+
   const {
     mutateAsync: createRestaurant,
     isPending: isCreateRestaurantPending,
@@ -85,50 +89,66 @@ const AddEditRestaurant: React.FC<AddEditRestaurantModalProps> = ({
   };
 
   if (isLoading) {
-    return <SectionLoader />;
+    return (
+      <div className="flex items-center justify-center min-h-[200px]">
+        <SectionLoader />
+      </div>
+    );
   }
+
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={isEdit ? "Edit Restaurant" : "Add Restaurant"}
-      width="sm"
-      ParentClassName="!bg-opacity-50"
-      TitleClassname="!text-Gray-900"
+      title={isEdit ? "Edit Restaurant" : "Add New Restaurant"}
+      width="md"
+      ParentClassName="backdrop-blur-sm"
+      TitleClassname="text-gray-900 font-semibold text-lg"
+      // CloseButton={
+      //   <button
+      //     onClick={onClose}
+      //     className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+      //   >
+      //     <XMarkIcon className="h-5 w-5 text-gray-500" />
+      //   </button>
+      // }
+
       footer={
-        <div className="flex items-center justify-end gap-2.5 mt-10px">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
           <Button
             variant="filled"
             title="Cancel"
-            className="px-6 py-3 rounded-lg !bg-blue-100 border border-solid !border-blue-500 !text-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
             onClick={onClose}
+            className="px-4 py-2 text-gray-700 hover:bg-gray-50 border-gray-300"
             disabled={isCreateRestaurantPending || isUpdateRestaurantPending}
           />
           <Button
             variant="filled"
-            title={isEdit ? "Update" : "Save"}
+            title={isEdit ? "Update Restaurant" : "Create Restaurant"}
             onClick={handleSubmit(onSubmit)}
-            className="px-6 py-3 rounded-lg !bg-blue-100 border border-solid !border-blue-500 !text-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
+            className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white"
             isLoading={isCreateRestaurantPending || isUpdateRestaurantPending}
+            disabled={!isDirty && isEdit}
           />
         </div>
       }
     >
-      <div className="flex items-center justify-center">
-        <div className="w-full max-w-md bg-white ">
-          <InputField
-            label="Restaurant Name"
-            name="name"
-            error={errors?.name?.message}
-            register={register}
-            inputClass="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-          />
-          <FileUpload
-            value={image}
-            onChange={(files) => setValue("image", files)}
-            error={errors?.image?.message}
-          />
-        </div>
+      <div className="space-y-6 py-2">
+        <InputField
+          label="Restaurant Name"
+          name="name"
+          error={errors?.name?.message}
+          register={register}
+          inputClass="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          labelClass="block text-sm font-medium text-gray-700 mb-1"
+        />
+
+        <FileUpload
+          value={image}
+          onChange={(files) => setValue("image", files)}
+          error={errors?.image?.message}
+          label="Restaurant Image"
+        />
       </div>
     </Modal>
   );

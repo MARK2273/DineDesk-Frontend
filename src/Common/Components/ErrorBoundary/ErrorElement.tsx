@@ -1,6 +1,6 @@
 // ** Packages **
-import { useRouteError } from 'react-router-dom';
-import Error from './Error';
+import { useRouteError } from "react-router-dom";
+import Error from "./Error";
 
 const ErrorElement = (props: any) => {
   const error = useRouteError();
