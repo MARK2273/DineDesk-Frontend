@@ -33,7 +33,7 @@ import ShopingBag from "../../../assets/svg/ShopingBag.svg?react";
 import SchedulerDatePickerLeftArrow from "../../../assets/svg/SchedulerDatePickerLeftArrow.svg?react";
 import SchedulerDatePickerRightArrow from "../../../assets/svg/SchedulerDatePickerRightArrow.svg?react";
 import Calendar from "../../../assets/svg/Calendar.svg?react";
-import SchedulerDatePickerClose from "../../../assets/svg/SchedulerDatePickerClose.svg?react";
+import SchedulerDatePickerClose from "../../../assets/svg/SchedulerDatepickerClose.svg?react";
 import Image from "../Image";
 import SectionLoader from "../Loader/Spinner";
 
