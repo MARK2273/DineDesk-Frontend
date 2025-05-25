@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -25,6 +25,9 @@ import { RootState } from "@dine-desk/redux/store";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import Icon from "@dine-desk/Common/Components/Icon";
+import DateRangePicker, {
+  DateRange,
+} from "@dine-desk/Common/Components/FormField/DateRangePicker";
 
 const colors = {
   primary: "#4F46E5", // Soft indigo
@@ -91,9 +94,27 @@ const Dashboard = () => {
   );
   const restaurantId = selectedRestaurant?.id;
 
-  const { data: dashboardData, isLoading } = useGetDashboard(
-    restaurantId ?? ""
-  );
+  const [dateRange, setDateRange] = useState<DateRange>({
+    startDate: null,
+    endDate: null,
+  });
+
+  const getApiParams = () => {
+    if (dateRange.startDate && dateRange.endDate) {
+      return {
+        timeRange: "custom",
+        startDate: dateRange.startDate.toISOString().split("T")[0],
+        endDate: dateRange.endDate.toISOString().split("T")[0],
+      };
+    }
+    return {}; // Return empty object when no dates are selected
+  };
+
+  const {
+    data: dashboardData,
+    isLoading,
+    refetch,
+  } = useGetDashboard(restaurantId ?? "", getApiParams());
 
   const dailyStats =
     dashboardData?.dailyStats?.map((stat: any) => ({
@@ -119,6 +140,12 @@ const Dashboard = () => {
     const existingHour = hourlyStats.find((h: any) => h.hour.startsWith(hour));
     return existingHour || { hour: `${hour}:00`, orders: 0 };
   });
+
+  useEffect(() => {
+    if (restaurantId && dateRange.startDate && dateRange.endDate) {
+      refetch();
+    }
+  }, [dateRange.startDate, dateRange.endDate, restaurantId, refetch]);
 
   return isLoading ? (
     <SectionLoader />
@@ -150,85 +177,102 @@ const Dashboard = () => {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white rounded-lg shadow-xs border border-gray-100 p-4 mb-6"
+        className="flex flex-col gap-5"
       >
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="text-base font-medium text-gray-700">
-            Daily Performance
-          </h2>
-          <span className="text-xs text-gray-400">Last 7 days</span>
-        </div>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={dailyStats}>
-              <defs>
-                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366F1" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10B981" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
-                stroke="#E5E7EB"
-              />
-              <XAxis
-                dataKey="date"
-                tick={{ fill: colors.neutral, fontSize: 12 }}
-                axisLine={{ stroke: "#E5E7EB" }}
-                tickLine={false}
-              />
-              <YAxis
-                yAxisId="left"
-                orientation="left"
-                tick={{ fill: colors.neutral, fontSize: 12 }}
-                axisLine={{ stroke: "#E5E7EB" }}
-                tickLine={false}
-              />
-              <YAxis
-                yAxisId="right"
-                orientation="right"
-                tick={{ fill: colors.neutral, fontSize: 12 }}
-                axisLine={{ stroke: "#E5E7EB" }}
-                tickLine={false}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "white",
-                  borderColor: "#E5E7EB",
-                  borderRadius: "6px",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                  fontSize: "12px",
-                }}
-              />
-              <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }} />
-              <Area
-                yAxisId="left"
-                type="monotone"
-                dataKey="revenue"
-                name="Revenue ($)"
-                stroke="#6366F1"
-                strokeWidth={1.5}
-                fillOpacity={1}
-                fill="url(#colorRevenue)"
-              />
-              <Area
-                yAxisId="right"
-                type="monotone"
-                dataKey="orders"
-                name="Orders"
-                stroke="#10B981"
-                strokeWidth={1.5}
-                fillOpacity={1}
-                fill="url(#colorOrders)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+        <DateRangePicker
+          startDate={dateRange.startDate}
+          endDate={dateRange.endDate}
+          onChange={(range) => {
+            setDateRange(range);
+          }}
+          isClearable={true}
+        />
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-lg shadow-xs border border-gray-100 p-4 mb-6"
+        >
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="text-base font-medium text-gray-700">
+              Daily Performance
+            </h2>
+            {/* <span className="text-xs text-gray-400">All Time</span> */}
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={dailyStats}>
+                <defs>
+                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#E5E7EB"
+                />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fill: colors.neutral, fontSize: 12 }}
+                  axisLine={{ stroke: "#E5E7EB" }}
+                  tickLine={false}
+                />
+                <YAxis
+                  yAxisId="left"
+                  orientation="left"
+                  tick={{ fill: colors.neutral, fontSize: 12 }}
+                  axisLine={{ stroke: "#E5E7EB" }}
+                  tickLine={false}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  tick={{ fill: colors.neutral, fontSize: 12 }}
+                  axisLine={{ stroke: "#E5E7EB" }}
+                  tickLine={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "white",
+                    borderColor: "#E5E7EB",
+                    borderRadius: "6px",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                    fontSize: "12px",
+                  }}
+                />
+                <Legend
+                  wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
+                />
+                <Area
+                  yAxisId="left"
+                  type="monotone"
+                  dataKey="revenue"
+                  name="Revenue ($)"
+                  stroke="#6366F1"
+                  strokeWidth={1.5}
+                  fillOpacity={1}
+                  fill="url(#colorRevenue)"
+                />
+                <Area
+                  yAxisId="right"
+                  type="monotone"
+                  dataKey="orders"
+                  name="Orders"
+                  stroke="#10B981"
+                  strokeWidth={1.5}
+                  fillOpacity={1}
+                  fill="url(#colorOrders)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
       </motion.div>
 
       {/* Bottom Charts */}

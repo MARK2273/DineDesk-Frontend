@@ -30,6 +30,10 @@ import ChooseImage from "../../../assets/svg/ChooseImage.svg?react";
 import Files from "../../../assets/svg/Files.svg?react";
 import Revenue from "../../../assets/svg/Revenue.svg?react";
 import ShopingBag from "../../../assets/svg/ShopingBag.svg?react";
+import SchedulerDatePickerLeftArrow from "../../../assets/svg/SchedulerDatePickerLeftArrow.svg?react";
+import SchedulerDatePickerRightArrow from "../../../assets/svg/SchedulerDatePickerRightArrow.svg?react";
+import Calendar from "../../../assets/svg/Calendar.svg?react";
+import SchedulerDatePickerClose from "../../../assets/svg/SchedulerDatepickerClose.svg?react";
 import Image from "../Image";
 import SectionLoader from "../Loader/Spinner";
 
@@ -61,7 +65,11 @@ export type IconNameType =
   | "files"
   | "revenue"
   | "shopingBag"
-  | "logout";
+  | "logout"
+  | "schedulerDatePickerLeftArrow"
+  | "schedulerDatePickerRightArrow"
+  | "calendar"
+  | "schedulerDatePickerClose";
 
 type IconProps = {
   name: IconNameType;
@@ -153,6 +161,14 @@ const Icon = ({
         return <Revenue {...iconProps} />;
       case "shopingBag":
         return <ShopingBag {...iconProps} />;
+      case "schedulerDatePickerLeftArrow":
+        return <SchedulerDatePickerLeftArrow {...iconProps} />;
+      case "schedulerDatePickerRightArrow":
+        return <SchedulerDatePickerRightArrow {...iconProps} />;
+      case "calendar":
+        return <Calendar {...iconProps} />;
+      case "schedulerDatePickerClose":
+        return <SchedulerDatePickerClose {...iconProps} />;
       default:
         return <></>;
     }
